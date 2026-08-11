@@ -13,10 +13,14 @@ export function useAgentStream(sessionId: string | null) {
 
     eventSource.onmessage = (event) => {
       setLogs((prev) => [...prev, event.data]);
+      if (event.data && event.data.includes('[END_OF_STREAM]')) {
+        eventSource.close();
+        setIsStreaming(false);
+      }
     };
 
-    eventSource.onerror = (error) => {
-      console.error('SSE Error:', error);
+    eventSource.onerror = () => {
+      // EventSource fires error event on normal server-initiated stream close
       eventSource.close();
       setIsStreaming(false);
     };

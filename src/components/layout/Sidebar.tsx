@@ -19,7 +19,7 @@ export const Sidebar: React.FC = () => {
         <h2 className="font-main-heading mb-6">Workflow</h2>
         <ul className="space-y-6">
           {steps.map((step) => {
-            const isCompleted = step.id < currentStep;
+            const isCompleted = step.id < currentStep || (step.id === 5 && currentStep === 5);
             const isCurrent = step.id === currentStep;
 
             return (
