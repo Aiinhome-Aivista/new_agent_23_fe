@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply text-text-primary bg-white antialiased;
+  }
+}
+
+@layer components {
+  /* Typography Tokens */
+  .font-logo-title {
+    @apply text-[22px] font-bold;
+  }
+  .font-header-subtitle {
+    @apply text-[13px] font-normal;
+  }
+  .font-dropdown-label {
+    @apply text-[14px] font-normal text-text-secondary;
+  }
+  .font-dropdown-select {
+    @apply text-[14px] font-normal;
+  }
+  .font-btn-get-insight {
+    @apply text-[14px] font-bold uppercase;
+  }
+  .font-main-heading {
+    @apply text-[22px] font-normal;
+  }
+  .font-instruction-text {
+    @apply text-[17px] font-normal text-text-secondary;
+  }
+  .font-question-pill {
+    @apply text-[13px] font-normal;
+  }
+  .font-chat-input {
+    @apply text-[15px] font-normal;
+  }
+  .font-footer-text {
+    @apply text-[11px] font-normal text-text-secondary;
+  }
+
+  /* UI Utilities */
+  .bg-sidebar-custom {
+    @apply bg-sidebar-bg;
+  }
+  .btn-orange {
+    @apply bg-button-orange hover:bg-hover-orange text-white rounded transition-colors px-4 py-2 font-btn-get-insight;
+  }
+  .btn-get-insight {
+    @apply btn-orange; /* Alias for btn-orange */
+  }
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20;
+  }
+  
+  /* Input styles matching tokens */
+  .input-custom {
+    @apply bg-input-bg border border-light-border rounded px-3 py-2 focus:outline-none focus:border-orange-border focus:ring-1 focus:ring-orange-border transition-all;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--light-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-secondary);
+}
