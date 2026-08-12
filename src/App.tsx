@@ -6,6 +6,7 @@ import { UploadArtifactsView } from './views/UploadArtifactsView';
 import { DecompositionReviewView } from './views/DecompositionReviewView';
 import { AgentExecutionView } from './views/AgentExecutionView';
 import { WorkspaceView } from './views/WorkspaceView';
+import { HistoryView } from './views/HistoryView';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/new-session" replace />} />
           <Route path="/new-session" element={<NewSessionView />} />
+          <Route path="/history" element={<HistoryView />} />
           <Route path="/session/:id/upload" element={<UploadArtifactsView />} />
           <Route path="/session/:id/decomposition" element={<DecompositionReviewView />} />
           <Route path="/session/:id/executing" element={<AgentExecutionView />} />
