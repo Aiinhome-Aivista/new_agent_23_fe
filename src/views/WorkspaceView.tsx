@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { Download, Settings2, X, CheckCircle2, AlertTriangle, FileCode, Code2, ShieldCheck, Cpu, Check } from 'lucide-react';
 import api from '../services/api';
+import { useSessionStore } from '../store/useSessionStore';
 
 const ENHANCED_USER_SERVICE_TEST = `package com.example.service;
 
@@ -536,10 +537,19 @@ interface MatrixItem {
   status: string;
 }
 
+export interface TestFileItem {
+  test_id: string;
+  test_name: string;
+  code_content: string;
+  framework: string;
+}
+
 export const WorkspaceView: React.FC = () => {
   const { id } = useParams();
-  const [selectedFile, setSelectedFile] = useState<'UserServiceTest.java' | 'AuthServiceTest.java'>('UserServiceTest.java');
-  const [code, setCode] = useState(ENHANCED_USER_SERVICE_TEST);
+  const { techProfile } = useSessionStore();
+  const [testFiles, setTestFiles] = useState<TestFileItem[]>([]);
+  const [selectedFileName, setSelectedFileName] = useState<string>('');
+  const [code, setCode] = useState('');
   const [matrix, setMatrix] = useState<MatrixItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
@@ -552,34 +562,54 @@ export const WorkspaceView: React.FC = () => {
       if (res.data?.matrix?.length > 0) {
         setMatrix(res.data.matrix);
       } else {
-        setMatrix([
-          { rule_code: 'BR-001', rule_text: 'User Registration & Email Uniqueness', test_name: 'UserServiceTest.java', status: 'COVERED' },
-          { rule_code: 'BR-002', rule_text: 'User Authentication & Lockout Policy', test_name: 'AuthServiceTest.java', status: 'AMBIGUOUS' },
-          { rule_code: 'BR-003', rule_text: 'Profile Management & Phone E.164 Validation', test_name: 'UserServiceTest.java', status: 'COVERED' },
-          { rule_code: 'BR-004', rule_text: 'Soft Deletion & RBAC Authorization', test_name: 'UserServiceTest.java', status: 'COVERED' }
-        ]);
+        setMatrix([]);
       }
     } catch (e) {
       console.error(e);
-      setMatrix([
-        { rule_code: 'BR-001', rule_text: 'User Registration & Email Uniqueness', test_name: 'UserServiceTest.java', status: 'COVERED' },
-        { rule_code: 'BR-002', rule_text: 'User Authentication & Lockout Policy', test_name: 'AuthServiceTest.java', status: 'AMBIGUOUS' },
-        { rule_code: 'BR-003', rule_text: 'Profile Management & Phone E.164 Validation', test_name: 'UserServiceTest.java', status: 'COVERED' },
-        { rule_code: 'BR-004', rule_text: 'Soft Deletion & RBAC Authorization', test_name: 'UserServiceTest.java', status: 'COVERED' }
-      ]);
+      setMatrix([]);
+    }
+  };
+
+  const fetchTestFiles = async () => {
+    if (!id) return;
+    try {
+      const res = await api.get(`/sessions/${id}/tests`);
+      if (res.data?.tests?.length > 0) {
+        setTestFiles(res.data.tests);
+        const firstTest = res.data.tests[0];
+        setSelectedFileName(firstTest.test_name);
+        setCode(firstTest.code_content);
+      } else {
+        const defaults = [
+          { test_id: '1', test_name: 'UserServiceTest.java', code_content: ENHANCED_USER_SERVICE_TEST, framework: 'JUnit 5' },
+          { test_id: '2', test_name: 'AuthServiceTest.java', code_content: ENHANCED_AUTH_SERVICE_TEST, framework: 'JUnit 5' }
+        ];
+        setTestFiles(defaults);
+        setSelectedFileName(defaults[0].test_name);
+        setCode(defaults[0].code_content);
+      }
+    } catch (e) {
+      console.error(e);
+      const defaults = [
+        { test_id: '1', test_name: 'UserServiceTest.java', code_content: ENHANCED_USER_SERVICE_TEST, framework: 'JUnit 5' },
+        { test_id: '2', test_name: 'AuthServiceTest.java', code_content: ENHANCED_AUTH_SERVICE_TEST, framework: 'JUnit 5' }
+      ];
+      setTestFiles(defaults);
+      setSelectedFileName(defaults[0].test_name);
+      setCode(defaults[0].code_content);
     }
   };
 
   useEffect(() => {
     fetchMatrix();
+    fetchTestFiles();
   }, [id]);
 
-  const handleSelectFile = (fileName: 'UserServiceTest.java' | 'AuthServiceTest.java') => {
-    setSelectedFile(fileName);
-    if (fileName === 'UserServiceTest.java') {
-      setCode(ENHANCED_USER_SERVICE_TEST);
-    } else {
-      setCode(ENHANCED_AUTH_SERVICE_TEST);
+  const handleSelectFile = (fileName: string) => {
+    setSelectedFileName(fileName);
+    const targetFile = testFiles.find(tf => tf.test_name === fileName);
+    if (targetFile) {
+      setCode(targetFile.code_content);
     }
   };
 
@@ -626,9 +656,9 @@ export const WorkspaceView: React.FC = () => {
               <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded font-mono font-bold">100% COVERED</span>
             </h2>
             <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-text-secondary">
-              <span className="flex items-center gap-1 font-mono"><ShieldCheck className="w-3.5 h-3.5 text-green-600" /> Language: Java 17</span>
-              <span className="flex items-center gap-1 font-mono"><Cpu className="w-3.5 h-3.5 text-blue-600" /> Framework: JUnit 5</span>
-              <span className="flex items-center gap-1 font-mono"><CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> Mocking: Mockito 5</span>
+              <span className="flex items-center gap-1 font-mono"><ShieldCheck className="w-3.5 h-3.5 text-green-600" /> Language: {techProfile?.language || 'Java'}</span>
+              <span className="flex items-center gap-1 font-mono"><Cpu className="w-3.5 h-3.5 text-blue-600" /> Framework: {techProfile?.framework || 'JUnit 5'}</span>
+              <span className="flex items-center gap-1 font-mono"><CheckCircle2 className="w-3.5 h-3.5 text-orange-600" /> Mocking: {techProfile?.mockLibrary || 'Mockito'}</span>
               <span className="flex items-center gap-1 font-mono"><Check className="w-3.5 h-3.5 text-purple-600" /> Pattern: AAA</span>
               <span className="flex items-center gap-1 font-mono"><ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Guardrails: PASSED</span>
             </div>
@@ -664,41 +694,32 @@ export const WorkspaceView: React.FC = () => {
           <div className="p-3 border-b border-light-border bg-gray-50/80">
             <span className="text-[11px] font-bold text-text-secondary uppercase mb-2 block tracking-wider">Test Suite Files:</span>
             <div className="space-y-2">
-              <button 
-                onClick={() => handleSelectFile('UserServiceTest.java')}
-                className={`w-full text-left p-2.5 rounded-md flex justify-between items-center border transition-all text-xs font-mono ${
-                  selectedFile === 'UserServiceTest.java' 
-                    ? 'border-primary-orange bg-orange-50 font-bold text-orange-950 shadow-xs' 
-                    : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <FileCode className="w-4 h-4 text-primary-orange" />
-                  <span>UserServiceTest.java</span>
-                </div>
-                <span className="text-[10px] bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold">12 TESTS</span>
-              </button>
-
-              <button 
-                onClick={() => handleSelectFile('AuthServiceTest.java')}
-                className={`w-full text-left p-2.5 rounded-md flex justify-between items-center border transition-all text-xs font-mono ${
-                  selectedFile === 'AuthServiceTest.java' 
-                    ? 'border-yellow-500 bg-yellow-50 font-bold text-yellow-950 shadow-xs' 
-                    : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <FileCode className="w-4 h-4 text-yellow-600" />
-                  <span>AuthServiceTest.java</span>
-                </div>
-                <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${
-                  matrix.some(m => m.test_name === 'AuthServiceTest.java' && m.status === 'AMBIGUOUS')
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-green-100 text-green-800'
-                }`}>
-                  {matrix.some(m => m.test_name === 'AuthServiceTest.java' && m.status === 'AMBIGUOUS') ? '5 TESTS (AMBIGUOUS)' : '5 TESTS (COVERED)'}
-                </span>
-              </button>
+              {testFiles.map((tf) => {
+                const isSelected = tf.test_name === selectedFileName;
+                const isAmbiguous = matrix.some(m => m.test_name === tf.test_name && m.status === 'AMBIGUOUS');
+                
+                return (
+                  <button 
+                    key={tf.test_id}
+                    onClick={() => handleSelectFile(tf.test_name)}
+                    className={`w-full text-left p-2.5 rounded-md flex justify-between items-center border transition-all text-xs font-mono ${
+                      isSelected 
+                        ? 'border-primary-orange bg-orange-50 font-bold text-orange-950 shadow-xs' 
+                        : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <FileCode className={`w-4 h-4 ${isSelected ? 'text-primary-orange' : 'text-gray-500'}`} />
+                      <span>{tf.test_name}</span>
+                    </div>
+                    <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                      isAmbiguous ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                    }`}>
+                      {isAmbiguous ? 'AMBIGUOUS' : 'COVERED'}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -731,7 +752,7 @@ export const WorkspaceView: React.FC = () => {
               <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
               <span className="w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
               <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-              <span className="text-xs font-mono text-gray-200 ml-2 font-bold">src/test/java/com/example/service/{selectedFile}</span>
+              <span className="text-xs font-mono text-gray-200 ml-2 font-bold">{selectedFileName}</span>
             </div>
             <div className="flex items-center gap-2 text-[10px] text-gray-400 font-mono">
               <span className="bg-[#383838] px-2 py-0.5 rounded text-green-400 font-bold">AAA Pattern</span>
