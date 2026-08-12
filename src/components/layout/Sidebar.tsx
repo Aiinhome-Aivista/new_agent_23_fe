@@ -27,9 +27,9 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 bg-sidebar-custom text-white flex flex-col pt-8">
+    <aside className="w-64 bg-sidebar-custom text-white flex flex-col pt-8 border-r border-gray-800">
       <div className="px-6 flex-1">
-        <h2 className="font-main-heading mb-6">Workflow</h2>
+        <h2 className="font-main-heading mb-6 text-xs uppercase tracking-wider text-gray-400">Generation Pipeline</h2>
         <ul className="space-y-6">
           {steps.map((step) => {
             const isCompleted = step.id < currentStep || (step.id === 5 && currentStep === 5);
@@ -49,7 +49,7 @@ export const Sidebar: React.FC = () => {
                 ) : (
                   <Circle className="w-5 h-5 text-text-secondary" />
                 )}
-                <span className={`font-dropdown-label ${isCurrent ? 'text-white font-bold' : 'text-text-placeholder'}`}>
+                <span className={`font-dropdown-label text-sm ${isCurrent ? 'text-white font-bold' : 'text-text-placeholder'}`}>
                   {step.label}
                 </span>
               </li>
@@ -57,14 +57,16 @@ export const Sidebar: React.FC = () => {
           })}
         </ul>
       </div>
-      <div className="px-6 pb-8">
-        <h2 className="font-main-heading mb-4 text-text-secondary">Navigation</h2>
+
+      <div className="px-6 pb-8 space-y-3">
+        <h2 className="font-main-heading mb-2 text-xs uppercase tracking-wider text-gray-400">Navigation</h2>
+        
         <button 
           onClick={() => navigate('/history')} 
           className={`flex items-center gap-3 w-full opacity-90 hover:opacity-100 transition-opacity ${isHistory ? 'text-white font-bold' : 'text-text-placeholder'}`}
         >
           <History className={`w-5 h-5 ${isHistory ? 'text-primary-orange' : 'text-text-secondary'}`} />
-          <span className="font-dropdown-label">Session History</span>
+          <span className="font-dropdown-label text-sm">Session History</span>
         </button>
       </div>
     </aside>
