@@ -1,14 +1,16 @@
 import React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useSessionStore } from '../../store/useSessionStore';
+import { useNavigate } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const { sessionId } = useSessionStore();
+  const navigate = useNavigate();
 
   return (
     <header className="flex items-center justify-between px-6 py-4 border-b border-light-border bg-white">
       <div>
-        <h1 className="font-logo-title text-primary-orange">Unit-Test Case Generator Agent</h1>
+        <h1 className="font-logo-title text-primary-orange cursor-pointer" onClick={() => navigate('/')}>Unit-Test Case Generator Agent</h1>
         <p className="font-header-subtitle text-text-secondary mt-1">AI-Powered Enterprise Testing Assistant</p>
       </div>
       <div className="flex items-center gap-4">
