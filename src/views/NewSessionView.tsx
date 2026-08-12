@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
@@ -8,8 +8,12 @@ import { TechProfile } from '../types';
 export const NewSessionView: React.FC = () => {
   const { register, handleSubmit } = useForm<TechProfile>();
   const navigate = useNavigate();
-  const { setSessionId, setCurrentStep, setTechProfile } = useSessionStore();
+  const { setSessionId, setCurrentStep, setTechProfile, resetSession } = useSessionStore();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    resetSession();
+  }, [resetSession]);
 
   const onSubmit = async (data: TechProfile) => {
     setLoading(true);
