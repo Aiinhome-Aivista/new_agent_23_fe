@@ -554,6 +554,24 @@ export const WorkspaceView: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reviewReport, setReviewReport] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'matrix' | 'audit'>('matrix');
+
+  const fetchReviewReport = async () => {
+    if (!id) return;
+    try {
+      const res = await api.get(`/sessions/${id}/review-report`);
+      if (res.data?.report) {
+        setReviewReport(res.data.report);
+      } else {
+        setReviewReport(null);
+      }
+    } catch (e) {
+      console.error(e);
+      setReviewReport(null);
+    }
+  };
+
 
   const fetchMatrix = async () => {
     if (!id) return;
@@ -603,6 +621,7 @@ export const WorkspaceView: React.FC = () => {
   useEffect(() => {
     fetchMatrix();
     fetchTestFiles();
+    fetchReviewReport();
   }, [id]);
 
   const handleSelectFile = (fileName: string) => {
@@ -683,66 +702,173 @@ export const WorkspaceView: React.FC = () => {
 
       {/* Main Split Content Workspace */}
       <div className="flex flex-1 gap-4 overflow-hidden">
-        {/* Left Side: Traceability Matrix & File Navigation */}
-        <div className="w-1/3 bg-card border border-light-border rounded-lg flex flex-col overflow-hidden shadow-xs">
-          <div className="p-3 border-b border-light-border bg-input-bg flex justify-between items-center">
-            <h3 className="font-dropdown-label text-primary-text font-bold">Requirements Traceability Matrix</h3>
-            <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono font-bold">4 RULES MAPPED</span>
+        {/* Left Side: Traceability Matrix & Review Agent Audit */}
+        <div className="w-1/3 bg-white border border-light-border rounded-lg flex flex-col overflow-hidden shadow-xs">
+          
+          {/* Tabs Header */}
+          <div className="flex border-b border-light-border bg-input-bg">
+            <button
+              onClick={() => setActiveTab('matrix')}
+              className={`flex-1 py-3 px-4 text-xs font-bold transition-all text-center border-b-2 ${
+                activeTab === 'matrix'
+                  ? 'border-primary-orange text-primary-orange bg-white'
+                  : 'border-transparent text-text-secondary hover:text-text-primary hover:bg-gray-50/50'
+              }`}
+            >
+              Traceability Matrix
+            </button>
+            <button
+              onClick={() => setActiveTab('audit')}
+              className={`flex-1 py-3 px-4 text-xs font-bold transition-all text-center border-b-2 flex items-center justify-center gap-1.5 ${
+                activeTab === 'audit'
+                  ? 'border-primary-orange text-primary-orange bg-white'
+                  : 'border-transparent text-text-secondary hover:text-text-primary hover:bg-gray-50/50'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Review Agent Audit
+            </button>
           </div>
 
-          {/* Test Suite Selector Tabs */}
-          <div className="p-3 border-b border-light-border bg-muted/80">
-            <span className="text-[11px] font-bold text-secondary-text uppercase mb-2 block tracking-wider">Test Suite Files:</span>
-            <div className="space-y-2">
-              {testFiles.map((tf) => {
-                const isSelected = tf.test_name === selectedFileName;
-                const isAmbiguous = matrix.some(m => m.test_name === tf.test_name && m.status === 'AMBIGUOUS');
-                
-                return (
-                  <button 
-                    key={tf.test_id}
-                    onClick={() => handleSelectFile(tf.test_name)}
-                    className={`w-full text-left p-2.5 rounded-md flex justify-between items-center border transition-all text-xs font-mono ${
-                      isSelected 
-                        ? 'border-primary-orange bg-orange-50 font-bold text-orange-950 shadow-xs' 
-                        : 'border-light-border bg-card hover:bg-muted text-primary-text'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <FileCode className={`w-4 h-4 ${isSelected ? 'text-primary-orange' : 'text-secondary-text'}`} />
-                      <span>{tf.test_name}</span>
-                    </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${
-                      isAmbiguous ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-                    }`}>
-                      {isAmbiguous ? 'AMBIGUOUS' : 'COVERED'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Traceability Mapping Cards */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
-            <h4 className="text-[11px] font-bold text-secondary-text uppercase tracking-wider">Requirement Scenarios:</h4>
-            {matrix.map((item, idx) => (
-              <div key={idx} className="p-3 border border-light-border rounded-md bg-input-bg/60 hover:bg-card hover:border-orange-300 transition-all text-xs">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="font-mono font-bold text-primary-orange">{item.rule_code}</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                    item.status === 'COVERED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {item.status}
-                  </span>
+          {activeTab === 'matrix' ? (
+            <>
+              {/* Test Suite Selector Tabs */}
+              <div className="p-3 border-b border-light-border bg-gray-50/80">
+                <span className="text-[11px] font-bold text-text-secondary uppercase mb-2 block tracking-wider">Test Suite Files:</span>
+                <div className="space-y-2">
+                  {testFiles.map((tf) => {
+                    const isSelected = tf.test_name === selectedFileName;
+                    const isAmbiguous = matrix.some(m => m.test_name === tf.test_name && m.status === 'AMBIGUOUS');
+                    
+                    return (
+                      <button 
+                        key={tf.test_id}
+                        onClick={() => handleSelectFile(tf.test_name)}
+                        className={`w-full text-left p-2.5 rounded-md flex justify-between items-center border transition-all text-xs font-mono ${
+                          isSelected 
+                            ? 'border-primary-orange bg-orange-50 font-bold text-orange-950 shadow-xs' 
+                            : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileCode className={`w-4 h-4 ${isSelected ? 'text-primary-orange' : 'text-gray-500'}`} />
+                          <span>{tf.test_name}</span>
+                        </div>
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                          isAmbiguous ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                        }`}>
+                          {isAmbiguous ? 'AMBIGUOUS' : 'COVERED'}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
-                <p className="text-primary-text text-xs font-medium leading-relaxed">{item.rule_text}</p>
-                <span className="text-[10px] text-placeholder block mt-2 font-mono border-t border-light-border/60 pt-1">
-                  Mapped file: <strong className="text-secondary-text">{item.test_name}</strong>
-                </span>
               </div>
-            ))}
-          </div>
+
+              {/* Traceability Mapping Cards */}
+              <div className="flex-1 overflow-y-auto p-3 space-y-3">
+                <h4 className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Requirement Scenarios:</h4>
+                {matrix.map((item, idx) => (
+                  <div key={idx} className="p-3 border border-light-border rounded-md bg-input-bg/60 hover:bg-white hover:border-orange-300 transition-all text-xs">
+                    <div className="flex justify-between items-center mb-1.5">
+                      <span className="font-mono font-bold text-primary-orange">{item.rule_code}</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                        item.status === 'COVERED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {item.status}
+                      </span>
+                    </div>
+                    <p className="text-text-primary text-xs font-medium leading-relaxed">{item.rule_text}</p>
+                    <span className="text-[10px] text-text-placeholder block mt-2 font-mono border-t border-gray-200/60 pt-1">
+                      Mapped file: <strong className="text-text-secondary">{item.test_name}</strong>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            /* Review Agent Audit Tab */
+            <div className="flex-1 overflow-y-auto p-3 space-y-4">
+              {reviewReport ? (
+                <>
+                  {/* Summary Card */}
+                  <div className="p-4 border rounded-lg bg-gray-50/50 border-gray-200 shadow-2xs">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-xs font-bold text-text-secondary uppercase tracking-wider block">Audit Status:</span>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold font-mono flex items-center gap-1 ${
+                        reviewReport.status === 'PASSED'
+                          ? 'bg-green-100 text-green-800 border border-green-200'
+                          : 'bg-red-100 text-red-800 border border-red-200'
+                      }`}>
+                        {reviewReport.status === 'PASSED' ? (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> PASSED
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle className="w-3.5 h-3.5 text-red-600" /> ISSUES DETECTED
+                          </>
+                        )}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-bold text-text-primary mb-1">Executive Summary:</h4>
+                    <p className="text-text-secondary text-xs leading-relaxed">{reviewReport.summary}</p>
+                  </div>
+
+                  {/* Findings list */}
+                  <div className="space-y-3">
+                    <span className="text-[11px] font-bold text-text-secondary uppercase tracking-wider block">Audit Findings ({reviewReport.findings?.length || 0}):</span>
+                    
+                    {reviewReport.findings && reviewReport.findings.length > 0 ? (
+                      reviewReport.findings.map((finding: any, idx: number) => {
+                        const isError = finding.severity === 'ERROR';
+                        const isWarning = finding.severity === 'WARNING';
+                        
+                        return (
+                          <div 
+                            key={idx} 
+                            className={`p-3.5 border rounded-lg transition-all text-xs ${
+                              isError
+                                ? 'bg-red-50/30 border-red-200 hover:border-red-300'
+                                : isWarning
+                                  ? 'bg-yellow-50/30 border-yellow-200 hover:border-yellow-300'
+                                  : 'bg-blue-50/20 border-blue-200 hover:border-blue-300'
+                            }`}
+                          >
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="font-bold text-text-primary">{finding.type}</span>
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                isError
+                                  ? 'bg-red-100 text-red-800'
+                                  : isWarning
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-blue-100 text-blue-800'
+                              }`}>
+                                {finding.severity}
+                              </span>
+                            </div>
+                            <p className="text-text-secondary text-xs leading-relaxed leading-5">{finding.description}</p>
+                            {finding.rule_code && (
+                              <div className="mt-2.5 pt-1.5 border-t border-dashed border-gray-200/80 flex items-center gap-1 text-[10px] text-text-placeholder font-mono">
+                                <span>Target Rule:</span>
+                                <strong className="text-primary-orange">{finding.rule_code}</strong>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="text-center py-6 text-xs text-text-placeholder italic">No findings reported.</div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-20 text-xs text-text-placeholder italic">
+                  No review report available. Execute test generation to run the review agent audit.
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right Side: Monaco Code Editor */}
