@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSessionStore } from '../../store/useSessionStore';
-import { CheckCircle, Circle, PlayCircle, History } from 'lucide-react';
+import { CheckCircle, Circle, PlayCircle, History, LogOut } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const steps = [
@@ -12,11 +12,16 @@ const steps = [
 ];
 
 export const Sidebar: React.FC = () => {
-  const { currentStep, sessionId } = useSessionStore();
+  const { currentStep, sessionId, isAuthenticated, logout } = useSessionStore();
   const navigate = useNavigate();
   const location = useLocation();
 
   const isHistory = location.pathname === '/history';
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const handleStepClick = (stepId: number, path: string) => {
     if (stepId === 1) {
@@ -27,9 +32,9 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 bg-sidebar-custom text-white flex flex-col pt-8 border-r border-gray-800">
+    <aside className="w-64 bg-sidebar text-primary-foreground flex flex-col pt-8 border-r border-light-border">
       <div className="px-6 flex-1">
-        <h2 className="font-main-heading mb-6 text-xs uppercase tracking-wider text-gray-400">Generation Pipeline</h2>
+        <h2 className="font-main-heading mb-6 text-xs uppercase tracking-wider text-placeholder">Generation Pipeline</h2>
         <ul className="space-y-6">
           {steps.map((step) => {
             const isCompleted = step.id < currentStep || (step.id === 5 && currentStep === 5);
@@ -47,9 +52,9 @@ export const Sidebar: React.FC = () => {
                 ) : isCurrent ? (
                   <PlayCircle className="w-5 h-5 text-button-orange" />
                 ) : (
-                  <Circle className="w-5 h-5 text-text-secondary" />
+                  <Circle className="w-5 h-5 text-secondary-text" />
                 )}
-                <span className={`font-dropdown-label text-sm ${isCurrent ? 'text-white font-bold' : 'text-text-placeholder'}`}>
+                <span className={`font-dropdown-label text-sm ${isCurrent ? 'text-primary-foreground font-bold' : 'text-placeholder'}`}>
                   {step.label}
                 </span>
               </li>
@@ -59,15 +64,25 @@ export const Sidebar: React.FC = () => {
       </div>
 
       <div className="px-6 pb-8 space-y-3">
-        <h2 className="font-main-heading mb-2 text-xs uppercase tracking-wider text-gray-400">Navigation</h2>
+        <h2 className="font-main-heading mb-2 text-xs uppercase tracking-wider text-placeholder">Navigation</h2>
         
         <button 
           onClick={() => navigate('/history')} 
-          className={`flex items-center gap-3 w-full opacity-90 hover:opacity-100 transition-opacity ${isHistory ? 'text-white font-bold' : 'text-text-placeholder'}`}
+          className={`flex items-center gap-3 w-full opacity-90 hover:opacity-100 transition-opacity ${isHistory ? 'text-primary-foreground font-bold' : 'text-placeholder'}`}
         >
-          <History className={`w-5 h-5 ${isHistory ? 'text-primary-orange' : 'text-text-secondary'}`} />
+          <History className={`w-5 h-5 ${isHistory ? 'text-primary-orange' : 'text-secondary-text'}`} />
           <span className="font-dropdown-label text-sm">Session History</span>
         </button>
+
+        {isAuthenticated && (
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full opacity-90 hover:opacity-100 hover:text-red-400 transition-colors text-placeholder pt-2 mt-2 border-t border-light-border/20"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-dropdown-label text-sm">Sign Out</span>
+          </button>
+        )}
       </div>
     </aside>
   );

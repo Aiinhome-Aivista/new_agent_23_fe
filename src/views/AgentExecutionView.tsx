@@ -16,9 +16,9 @@ export const AgentExecutionView: React.FC = () => {
   };
 
   return (
-    <div className="mt-6 flex flex-col h-[calc(100vh-140px)] bg-[#1E1E1E] rounded-lg border border-[#333] overflow-hidden">
-      <div className="bg-[#2D2D2D] px-4 py-3 flex justify-between items-center border-b border-[#333]">
-        <div className="flex items-center gap-2 text-white">
+    <div className="mt-6 flex flex-col h-[calc(100vh-140px)] bg-card rounded-lg border border-light-border overflow-hidden">
+      <div className="bg-muted px-4 py-3 flex justify-between items-center border-b border-light-border">
+        <div className="flex items-center gap-2 text-primary-foreground">
           <Terminal className="w-5 h-5 text-button-orange" />
           <span className="font-bold">Agent Execution Terminal</span>
           {isStreaming && <span className="ml-2 w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>}
@@ -29,7 +29,7 @@ export const AgentExecutionView: React.FC = () => {
       </div>
       <div className="flex-1 overflow-y-auto p-4 font-mono text-sm text-[#A9B7C6] whitespace-pre-wrap">
         {logs.length === 0 ? (
-          <p className="text-text-placeholder italic">Waiting for agent traces...</p>
+          <p className="text-placeholder italic">Waiting for agent traces...</p>
         ) : (
           logs.map((log, index) => (
             <div key={index} className="mb-1">{log}</div>

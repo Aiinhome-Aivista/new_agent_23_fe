@@ -61,10 +61,10 @@ export const UploadArtifactsView: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded shadow-sm border border-light-border p-8 mt-10 max-w-4xl mx-auto space-y-8">
+    <div className="bg-card rounded shadow-sm border border-light-border p-8 mt-10 max-w-4xl mx-auto space-y-8">
       <div>
         <h2 className="font-main-heading mb-2">Upload Requirement & Specification Artifacts</h2>
-        <p className="text-sm text-text-secondary">
+        <p className="text-sm text-secondary-text">
           Provide your sprint/story artifacts along with your Git repository to let the AI formulate business rules and generate target unit tests.
         </p>
       </div>
@@ -86,22 +86,22 @@ export const UploadArtifactsView: React.FC = () => {
         <p className="font-instruction-text font-semibold">
           {isDragActive ? "Drop files here..." : "Drag & drop sprint / story files here, or click to browse"}
         </p>
-        <p className="text-xs text-text-placeholder mt-2">
+        <p className="text-xs text-placeholder mt-2">
           Supports BRD (.md, .txt, .docx), API Specifications (.json, .yaml), and Database Schemas (.sql)
         </p>
       </div>
 
       {files.length > 0 && (
         <div>
-          <h3 className="font-dropdown-label mb-3 font-semibold text-text-primary">Queued Requirement Artifacts ({files.length})</h3>
+          <h3 className="font-dropdown-label mb-3 font-semibold text-primary-text">Queued Requirement Artifacts ({files.length})</h3>
           <ul className="space-y-2">
             {files.map((file, i) => (
               <li key={i} className="flex justify-between items-center p-3 border border-light-border rounded bg-input-bg">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  <span className="font-chat-input text-sm font-medium text-text-primary">{file.name}</span>
+                  <span className="font-chat-input text-sm font-medium text-primary-text">{file.name}</span>
                 </div>
-                <span className="text-text-placeholder text-xs font-mono">{(file.size / 1024).toFixed(1)} KB</span>
+                <span className="text-placeholder text-xs font-mono">{(file.size / 1024).toFixed(1)} KB</span>
               </li>
             ))}
           </ul>
@@ -109,15 +109,15 @@ export const UploadArtifactsView: React.FC = () => {
       )}
 
       {/* Git Connection Section */}
-      <div className="border border-light-border rounded-lg p-6 bg-white shadow-sm">
-        <h3 className="font-dropdown-label text-md font-semibold text-text-primary mb-4 flex items-center gap-2">
+      <div className="border border-light-border rounded-lg p-6 bg-card shadow-sm">
+        <h3 className="font-dropdown-label text-md font-semibold text-primary-text mb-4 flex items-center gap-2">
           <GitBranch className="w-5 h-5 text-primary-orange" />
           Connect Git Repository (Optional)
         </h3>
         
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-text-secondary mb-1">Git Repository URL</label>
+            <label className="block text-xs font-semibold text-secondary-text mb-1">Git Repository URL</label>
             <input
               type="text"
               placeholder="e.g. https://github.com/username/project-repository.git"
@@ -125,8 +125,8 @@ export const UploadArtifactsView: React.FC = () => {
               onChange={(e) => setGitUrl(e.target.value)}
               className="w-full input-custom text-sm"
             />
-            <p className="text-xs text-text-placeholder mt-1">
-              For private repos, use format: <code className="bg-gray-100 px-1 py-0.5 rounded font-mono text-[11px]">https://&lt;token&gt;@github.com/user/repo.git</code>
+            <p className="text-xs text-placeholder mt-1">
+              For private repos, use format: <code className="bg-muted px-1 py-0.5 rounded font-mono text-[11px]">https://&lt;token&gt;@github.com/user/repo.git</code>
             </p>
           </div>
 
@@ -142,7 +142,7 @@ export const UploadArtifactsView: React.FC = () => {
           {showAdvanced && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-dashed border-light-border">
               <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1">Target Branch</label>
+                <label className="block text-xs font-semibold text-secondary-text mb-1">Target Branch</label>
                 <input
                   type="text"
                   placeholder="e.g. main or master"
@@ -152,7 +152,7 @@ export const UploadArtifactsView: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-text-secondary mb-1 flex items-center gap-1">
+                <label className="block text-xs font-semibold text-secondary-text mb-1 flex items-center gap-1">
                   <FolderOpen className="w-3.5 h-3.5" /> Subdirectory Path (Optional)
                 </label>
                 <input
@@ -170,7 +170,7 @@ export const UploadArtifactsView: React.FC = () => {
 
       {/* Footer / Submit Section */}
       <div className="pt-4 flex justify-between items-center border-t border-light-border">
-        <span className="text-xs text-text-secondary">
+        <span className="text-xs text-secondary-text">
           {uploading ? `Processing file ${uploadedCount} of ${files.length}...` : `${files.length} file(s) ready for decomposition.`}
         </span>
         <button 

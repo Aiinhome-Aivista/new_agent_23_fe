@@ -95,15 +95,15 @@ export const DecompositionReviewView: React.FC = () => {
   // Beautiful Loading Spinner
   if (loading && rules.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] mt-20 bg-white border border-light-border rounded-lg p-10 max-w-2xl mx-auto shadow-sm">
+      <div className="flex flex-col items-center justify-center min-h-[400px] mt-20 bg-card border border-light-border rounded-lg p-10 max-w-2xl mx-auto shadow-sm">
         <div className="w-16 h-16 border-4 border-primary-orange border-t-transparent rounded-full animate-spin mb-6"></div>
-        <h3 className="font-main-heading text-lg font-semibold text-text-primary mb-2 animate-pulse">
+        <h3 className="font-main-heading text-lg font-semibold text-primary-text mb-2 animate-pulse">
           AI Agent is analyzing your codebase and sprint...
         </h3>
-        <p className="text-sm text-text-secondary text-center max-w-md">
+        <p className="text-sm text-secondary-text text-center max-w-md">
           Please wait while the LLM parses the requirements, clones the git repository, crawls the source code files, and extracts the target business rules.
         </p>
-        <span className="text-xs text-text-placeholder mt-4 font-mono">Elapsed time: {timeElapsed}s</span>
+        <span className="text-xs text-placeholder mt-4 font-mono">Elapsed time: {timeElapsed}s</span>
       </div>
     );
   }
@@ -111,12 +111,12 @@ export const DecompositionReviewView: React.FC = () => {
   // Error/Empty State
   if (rules.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] mt-20 bg-white border border-light-border rounded-lg p-10 max-w-2xl mx-auto shadow-sm">
+      <div className="flex flex-col items-center justify-center min-h-[400px] mt-20 bg-card border border-light-border rounded-lg p-10 max-w-2xl mx-auto shadow-sm">
         <AlertTriangle className="w-12 h-12 text-yellow-500 mb-4" />
-        <h3 className="font-main-heading text-lg font-semibold text-text-primary mb-2">
+        <h3 className="font-main-heading text-lg font-semibold text-primary-text mb-2">
           No business rules extracted
         </h3>
-        <p className="text-sm text-text-secondary text-center max-w-md">
+        <p className="text-sm text-secondary-text text-center max-w-md">
           We couldn't extract any business rules from the uploaded sprint artifacts or connected git repository. Please check your repository URL, branch, and sprint files.
         </p>
         <button onClick={() => navigate(-1)} className="btn-orange mt-6">
@@ -131,7 +131,7 @@ export const DecompositionReviewView: React.FC = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="font-main-heading">Requirement & Service Decomposition Review</h2>
-          <p className="text-sm text-text-secondary">Verify extracted business rules and service mock dependencies before initiating test generation.</p>
+          <p className="text-sm text-secondary-text">Verify extracted business rules and service mock dependencies before initiating test generation.</p>
         </div>
         <button onClick={handleApprove} className="btn-orange shadow-md">
           Approve Boundaries & Start Test Generation
@@ -140,7 +140,7 @@ export const DecompositionReviewView: React.FC = () => {
 
       <div className="grid grid-cols-2 gap-6 flex-1 overflow-hidden">
         {/* Extracted Rules */}
-        <div className="bg-white border border-light-border rounded-lg p-5 overflow-y-auto shadow-sm">
+        <div className="bg-card border border-light-border rounded-lg p-5 overflow-y-auto shadow-sm">
           <h3 className="font-dropdown-label border-b border-light-border pb-3 mb-4 text-primary-orange flex justify-between items-center">
             <span>Extracted Business Rules & Acceptance Criteria</span>
             <span className="text-xs bg-orange-100 text-orange-800 px-2 py-0.5 rounded font-mono">{rules.length} Rules</span>
@@ -149,35 +149,35 @@ export const DecompositionReviewView: React.FC = () => {
             <div key={idx} className="p-4 bg-input-bg border border-orange-border/40 rounded-md mb-3 hover:border-orange-border transition-all">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-xs font-bold text-primary-orange uppercase font-mono">{rule.rule_code}</span>
-                <span className="text-[10px] bg-gray-200 text-gray-700 px-2 py-0.5 rounded font-semibold uppercase">{rule.rule_type}</span>
+                <span className="text-[10px] bg-muted text-primary-text px-2 py-0.5 rounded font-semibold uppercase">{rule.rule_type}</span>
               </div>
-              <p className="font-instruction-text text-sm text-text-primary mt-1">{rule.rule_text}</p>
+              <p className="font-instruction-text text-sm text-primary-text mt-1">{rule.rule_text}</p>
             </div>
           ))}
         </div>
 
         {/* Service Contracts & Mocks */}
-        <div className="bg-white border border-light-border rounded-lg p-5 overflow-y-auto shadow-sm">
+        <div className="bg-card border border-light-border rounded-lg p-5 overflow-y-auto shadow-sm">
           <h3 className="font-dropdown-label border-b border-light-border pb-3 mb-4 text-primary-orange flex justify-between items-center">
             <span>Service Catalogue & Mockable Dependencies</span>
             <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-mono">{services.length} Services</span>
           </h3>
           {services.map((srv, idx) => (
-            <div key={idx} className="p-4 border border-light-border rounded-md mb-4 bg-white shadow-xs">
+            <div key={idx} className="p-4 border border-light-border rounded-md mb-4 bg-card shadow-xs">
               <div className="flex justify-between items-center">
-                <h4 className="font-bold text-text-primary text-base">{srv.name}</h4>
+                <h4 className="font-bold text-primary-text text-base">{srv.name}</h4>
                 <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded font-bold uppercase">PROPOSED</span>
               </div>
               <div className="mt-3">
-                <span className="text-xs font-semibold text-text-secondary uppercase">Target Methods:</span>
+                <span className="text-xs font-semibold text-secondary-text uppercase">Target Methods:</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {srv.methods?.map((m, mi) => (
-                    <span key={mi} className="text-xs font-mono bg-gray-100 text-gray-800 px-2 py-0.5 rounded border border-gray-200">{m}()</span>
+                    <span key={mi} className="text-xs font-mono bg-muted text-primary-text px-2 py-0.5 rounded border border-light-border">{m}()</span>
                   ))}
                 </div>
               </div>
               <div className="mt-3">
-                <span className="text-xs font-semibold text-text-secondary uppercase">Mocked Collaborators:</span>
+                <span className="text-xs font-semibold text-secondary-text uppercase">Mocked Collaborators:</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {srv.dependencies?.map((d, di) => (
                     <span key={di} className="text-xs font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">@{d}</span>

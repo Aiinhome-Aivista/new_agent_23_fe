@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import { MainLayout } from './components/layout/MainLayout';
 import { LandingView } from './views/LandingView';
 import { LoginView } from './views/LoginView';
@@ -8,8 +9,19 @@ import { DecompositionReviewView } from './views/DecompositionReviewView';
 import { AgentExecutionView } from './views/AgentExecutionView';
 import { WorkspaceView } from './views/WorkspaceView';
 import { HistoryView } from './views/HistoryView';
+import { useThemeStore } from './store/useThemeStore';
 
 function App() {
+  const { theme } = useThemeStore();
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
   return (
     <Router>
       <Routes>

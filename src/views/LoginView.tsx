@@ -90,7 +90,7 @@ export const LoginView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F8] flex items-center justify-center p-6 text-text-primary font-sans">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 text-foreground font-sans">
       <div className="w-full max-w-md">
         {/* Top Logo & Header */}
         <div className="text-center mb-8">
@@ -98,21 +98,21 @@ export const LoginView: React.FC = () => {
             className="inline-flex p-3 bg-primary-orange rounded-xl shadow-sm mb-3 cursor-pointer" 
             onClick={() => navigate('/')}
           >
-            <Cpu className="w-8 h-8 text-white" />
+            <Cpu className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="font-logo-title text-primary-orange">Unit-Test Case Generator</h1>
-          <p className="font-header-subtitle text-text-secondary mt-1">Enterprise AI Specialist Testing Platform</p>
+          <p className="font-header-subtitle text-secondary-text mt-1">Enterprise AI Specialist Testing Platform</p>
         </div>
 
         {/* Card Container using Global CSS Design Tokens */}
-        <div className="bg-white border border-light-border rounded-xl p-6 sm:p-8 shadow-sm">
+        <div className="bg-card border border-light-border rounded-xl p-6 sm:p-8 shadow-sm">
           {/* Tab Switcher */}
-          <div className="flex bg-gray-100 p-1 rounded-lg mb-6 border border-gray-200">
+          <div className="flex bg-muted p-1 rounded-lg mb-6 border border-light-border">
             <button 
               type="button"
               onClick={() => setIsRegister(false)}
               className={`flex-1 py-2 text-xs font-semibold rounded-md transition-all ${
-                !isRegister ? 'bg-primary-orange text-white shadow-xs' : 'text-text-secondary hover:text-text-primary'
+                !isRegister ? 'bg-primary-orange text-primary-foreground shadow-xs' : 'text-secondary-text hover:text-foreground'
               }`}
             >
               Sign In
@@ -121,7 +121,7 @@ export const LoginView: React.FC = () => {
               type="button"
               onClick={() => setIsRegister(true)}
               className={`flex-1 py-2 text-xs font-semibold rounded-md transition-all ${
-                isRegister ? 'bg-primary-orange text-white shadow-xs' : 'text-text-secondary hover:text-text-primary'
+                isRegister ? 'bg-primary-orange text-primary-foreground shadow-xs' : 'text-secondary-text hover:text-foreground'
               }`}
             >
               Register Account
@@ -129,7 +129,7 @@ export const LoginView: React.FC = () => {
           </div>
 
           {errorMessage && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-xs text-red-700">
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 rounded-md text-xs text-red-700 dark:text-red-400">
               {errorMessage}
             </div>
           )}
@@ -137,9 +137,9 @@ export const LoginView: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1.5 font-dropdown-label">Full Name</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5 font-dropdown-label">Full Name</label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
+                  <User className="w-4 h-4 text-secondary-text absolute left-3 top-2.5" />
                   <input 
                     type="text" 
                     required
@@ -153,9 +153,9 @@ export const LoginView: React.FC = () => {
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-text-primary mb-1.5 font-dropdown-label">Work Email</label>
+              <label className="block text-xs font-semibold text-foreground mb-1.5 font-dropdown-label">Work Email</label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
+                <Mail className="w-4 h-4 text-secondary-text absolute left-3 top-2.5" />
                 <input 
                   type="email" 
                   required
@@ -168,9 +168,9 @@ export const LoginView: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-text-primary mb-1.5 font-dropdown-label">Password</label>
+              <label className="block text-xs font-semibold text-foreground mb-1.5 font-dropdown-label">Password</label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-text-secondary absolute left-3 top-2.5" />
+                <Lock className="w-4 h-4 text-secondary-text absolute left-3 top-2.5" />
                 <input 
                   type={showPassword ? 'text' : 'password'} 
                   required
@@ -182,7 +182,7 @@ export const LoginView: React.FC = () => {
                 <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-text-secondary hover:text-text-primary"
+                  className="absolute right-3 top-2.5 text-secondary-text hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -208,25 +208,25 @@ export const LoginView: React.FC = () => {
 
           {/* Quick Demo Login Preset Buttons */}
           <div className="mt-6 pt-5 border-t border-light-border">
-            <span className="text-[10px] uppercase tracking-wider text-text-secondary font-mono font-bold block mb-2.5 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-secondary-text font-mono font-bold block mb-2.5 text-center">
               ⚡ Quick One-Click Demo Access:
             </span>
             <div className="grid grid-cols-2 gap-2">
               <button 
                 type="button"
                 onClick={() => handleDemoLogin('Solution Architect', 'Alex Morgan', 'alex.architect@enterprise.com')}
-                className="p-2.5 bg-input-bg hover:bg-orange-100/50 border border-orange-200 rounded-lg text-left transition-all"
+                className="p-2.5 bg-input hover:bg-muted border border-border rounded-lg text-left transition-all"
               >
                 <div className="text-[11px] font-bold text-primary-orange">Lead Architect</div>
-                <div className="text-[9px] text-text-secondary font-mono">alex.architect@...</div>
+                <div className="text-[9px] text-secondary-text font-mono">alex.architect@...</div>
               </button>
               <button 
                 type="button"
                 onClick={() => handleDemoLogin('QA Lead Manager', 'Sarah Jenkins', 'sarah.qa@enterprise.com')}
-                className="p-2.5 bg-input-bg hover:bg-orange-100/50 border border-orange-200 rounded-lg text-left transition-all"
+                className="p-2.5 bg-input hover:bg-muted border border-border rounded-lg text-left transition-all"
               >
-                <div className="text-[11px] font-bold text-orange-700">QA Lead Manager</div>
-                <div className="text-[9px] text-text-secondary font-mono">sarah.qa@...</div>
+                <div className="text-[11px] font-bold text-primary">QA Lead Manager</div>
+                <div className="text-[9px] text-secondary-text font-mono">sarah.qa@...</div>
               </button>
             </div>
           </div>
@@ -236,7 +236,7 @@ export const LoginView: React.FC = () => {
         <div className="text-center mt-6">
           <button 
             onClick={() => navigate('/')} 
-            className="text-xs text-text-secondary hover:text-primary-orange font-medium transition-colors"
+            className="text-xs text-secondary-text hover:text-primary-orange font-medium transition-colors"
           >
             ← Return to Landing Page
           </button>

@@ -31,7 +31,7 @@ export const NewSessionView: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded shadow-sm border border-light-border p-8 max-w-2xl mx-auto mt-10">
+    <div className="bg-card rounded shadow-sm border border-light-border p-8 max-w-2xl mx-auto mt-10">
       <h2 className="font-main-heading mb-6">Initialize Test Generation Session</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
