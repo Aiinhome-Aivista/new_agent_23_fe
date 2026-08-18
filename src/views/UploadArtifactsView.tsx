@@ -2,8 +2,16 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
-import { UploadCloud, CheckCircle2, GitBranch, FolderOpen, Settings2 } from 'lucide-react';
+import { UploadCloud, CheckCircle2, GitBranch, FolderOpen, Settings2, FileText, Plus } from 'lucide-react';
 import api from '../services/api';
+
+interface JiraTicket {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  status: string;
+}
 
 export const UploadArtifactsView: React.FC = () => {
   const { id } = useParams();
@@ -13,6 +21,80 @@ export const UploadArtifactsView: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [uploadedCount, setUploadedCount] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Jira State
+  const [jiraTickets, setJiraTickets] = useState<JiraTicket[]>([]);
+  const [loadingTickets, setLoadingTickets] = useState(false);
+  const [jiraUrl, setJiraUrl] = useState(() => localStorage.getItem('jiraUrl') || '');
+  const [jiraEmail, setJiraEmail] = useState(() => localStorage.getItem('jiraEmail') || '');
+  const [jiraToken, setJiraToken] = useState(() => localStorage.getItem('jiraToken') || '');
+  const [jiraProject, setJiraProject] = useState(() => localStorage.getItem('jiraProject') || '');
+  const [jiraStatus, setJiraStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  React.useEffect(() => {
+    localStorage.setItem('jiraUrl', jiraUrl);
+    localStorage.setItem('jiraEmail', jiraEmail);
+    localStorage.setItem('jiraToken', jiraToken);
+    localStorage.setItem('jiraProject', jiraProject);
+  }, [jiraUrl, jiraEmail, jiraToken, jiraProject]);
+
+  const fetchTickets = async () => {
+    let correctedUrl = jiraUrl.trim();
+    // Auto-correct common typos in Atlassian domain
+    if (correctedUrl.includes('.atlasian.')) {
+      correctedUrl = correctedUrl.replace('.atlasian.', '.atlassian.');
+    }
+    if (correctedUrl.endsWith('.atlassian.com')) {
+      correctedUrl = correctedUrl.replace('.atlassian.com', '.atlassian.net');
+    }
+    
+    // Update state if we corrected it so the user sees the fix
+    if (correctedUrl !== jiraUrl) {
+      setJiraUrl(correctedUrl);
+    }
+
+    if (!correctedUrl || !jiraEmail || !jiraToken || !jiraProject) {
+      setErrorMsg("Please provide Jira URL, Project Name, Email, and API Token to connect.");
+      setJiraStatus('error');
+      return;
+    }
+    
+    setLoadingTickets(true);
+    setJiraStatus('idle');
+    setErrorMsg(null);
+    try {
+      const response = await api.post('/jira/tickets', {
+        url: correctedUrl,
+        email: jiraEmail,
+        token: jiraToken,
+        jql: `project="${jiraProject}" AND statusCategory != "Done" ORDER BY updated DESC`
+      });
+      setJiraTickets(response.data.tickets || []);
+      setJiraStatus('success');
+    } catch (err: any) {
+      console.error("Failed to connect to Jira:", err);
+      setErrorMsg(err.response?.data?.detail || "Failed to connect to Jira. Check your credentials.");
+      setJiraStatus('error');
+    } finally {
+      setLoadingTickets(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (jiraUrl && jiraEmail && jiraToken && jiraProject) {
+      fetchTickets();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleSelectTicket = (ticket: JiraTicket) => {
+    // Check if already added
+    if (files.some(f => f.name === `${ticket.id}.json`)) return;
+
+    const fileContent = JSON.stringify(ticket, null, 2);
+    const file = new File([fileContent], `${ticket.id}.json`, { type: 'application/json' });
+    setFiles(prev => [...prev, file]);
+  };
 
   // Git Configuration State
   const [gitUrl, setGitUrl] = useState('');
@@ -107,6 +189,101 @@ export const UploadArtifactsView: React.FC = () => {
           </ul>
         </div>
       )}
+
+      {/* Jira Tickets Section */}
+      <div className="border border-light-border rounded-lg p-6 bg-card shadow-sm">
+        <h3 className="font-dropdown-label text-md font-semibold text-primary-text mb-4 flex items-center gap-2">
+          <FileText className="w-5 h-5 text-blue-500" />
+          Connect Jira & Sync Tickets
+          {jiraStatus === 'success' && <span className="ml-2 flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-100 border border-green-300 px-2 py-0.5 rounded-full"><CheckCircle2 className="w-3 h-3" /> Connected</span>}
+          {jiraStatus === 'error' && <span className="ml-2 flex items-center gap-1 text-[11px] font-bold text-red-700 bg-red-100 border border-red-300 px-2 py-0.5 rounded-full">Connection Failed</span>}
+        </h3>
+        
+        <div className="space-y-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-secondary-text mb-1">Jira Instance URL</label>
+              <input
+                type="text"
+                placeholder="e.g. https://your-domain.atlassian.net"
+                value={jiraUrl}
+                onChange={(e) => setJiraUrl(e.target.value)}
+                className="w-full input-custom text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-secondary-text mb-1">Project Name (or Key)</label>
+              <input
+                type="text"
+                placeholder="e.g. PROJ or My Project"
+                value={jiraProject}
+                onChange={(e) => setJiraProject(e.target.value)}
+                className="w-full input-custom text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-secondary-text mb-1">Email Address</label>
+              <input
+                type="email"
+                placeholder="e.g. your-email@company.com"
+                value={jiraEmail}
+                onChange={(e) => setJiraEmail(e.target.value)}
+                className="w-full input-custom text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-secondary-text mb-1">API Token</label>
+              <input
+                type="password"
+                placeholder="Your Jira API Token"
+                value={jiraToken}
+                onChange={(e) => setJiraToken(e.target.value)}
+                className="w-full input-custom text-sm"
+              />
+            </div>
+          </div>
+          <button 
+            type="button" 
+            onClick={fetchTickets}
+            disabled={loadingTickets}
+            className="btn-outline border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50"
+          >
+            {loadingTickets ? 'Connecting & Syncing...' : 'Connect'}
+          </button>
+        </div>
+
+        {loadingTickets ? (
+          <p className="text-sm text-secondary-text">Fetching tickets from Jira...</p>
+        ) : jiraTickets.length > 0 ? (
+          <div className="space-y-3">
+            {jiraTickets.map(ticket => {
+              const isSelected = files.some(f => f.name === `${ticket.id}.json`);
+              return (
+                <div key={ticket.id} className={`flex justify-between items-start p-4 border rounded transition-colors ${isSelected ? 'border-green-300 bg-green-50' : 'border-light-border bg-input-bg hover:border-blue-300'}`}>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">{ticket.id}</span>
+                      <span className="text-xs font-semibold text-gray-500 border border-gray-200 px-2 py-0.5 rounded">{ticket.type}</span>
+                    </div>
+                    <h4 className="font-semibold text-sm text-primary-text">{ticket.title}</h4>
+                    <p className="text-xs text-secondary-text mt-1 line-clamp-2">{ticket.description}</p>
+                  </div>
+                  <button
+                    onClick={() => handleSelectTicket(ticket)}
+                    disabled={isSelected}
+                    className={`shrink-0 ml-4 flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded transition-colors ${isSelected ? 'bg-green-100 text-green-700 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                  >
+                    {isSelected ? <CheckCircle2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                    {isSelected ? 'Selected' : 'Select'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-secondary-text">No Jira tickets available.</p>
+        )}
+      </div>
 
       {/* Git Connection Section */}
       <div className="border border-light-border rounded-lg p-6 bg-card shadow-sm">
