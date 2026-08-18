@@ -1,4 +1,5 @@
 export interface TechProfile {
+  session_name?: string;
   language: string;
   framework: string;
   mockLibrary: string;

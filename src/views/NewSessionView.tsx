@@ -35,6 +35,16 @@ export const NewSessionView: React.FC = () => {
       <h2 className="font-main-heading mb-6">Initialize Test Generation Session</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
+          <label className="block font-dropdown-label mb-2">Session Name / Description</label>
+          <input
+            type="text"
+            placeholder="e.g. User Authentication Suite, Ticket KAN-2"
+            {...register('session_name')}
+            className="w-full input-custom text-sm"
+            required
+          />
+        </div>
+        <div>
           <label className="block font-dropdown-label mb-2">Target Language</label>
           <select {...register('language')} className="w-full input-custom font-dropdown-select">
             <option value="Java">Java</option>

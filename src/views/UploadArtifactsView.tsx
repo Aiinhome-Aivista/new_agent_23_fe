@@ -18,6 +18,7 @@ export const UploadArtifactsView: React.FC = () => {
   const navigate = useNavigate();
   const { setCurrentStep } = useSessionStore();
   const [files, setFiles] = useState<File[]>([]);
+  const [existingArtifacts, setExistingArtifacts] = useState<{ filename: string; file_type: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadedCount, setUploadedCount] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -87,9 +88,30 @@ export const UploadArtifactsView: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  React.useEffect(() => {
+    const fetchSessionData = async () => {
+      if (!id) return;
+      try {
+        const response = await api.get(`/sessions/${id}`);
+        const { tech_profile, artifacts } = response.data;
+        if (tech_profile) {
+          if (tech_profile.git_url) setGitUrl(tech_profile.git_url);
+          if (tech_profile.git_branch) setGitBranch(tech_profile.git_branch);
+          if (tech_profile.git_path) setGitPath(tech_profile.git_path);
+        }
+        if (artifacts) {
+          setExistingArtifacts(artifacts);
+        }
+      } catch (err) {
+        console.error("Failed to load session details:", err);
+      }
+    };
+    fetchSessionData();
+  }, [id]);
+
   const handleSelectTicket = (ticket: JiraTicket) => {
-    // Check if already added
-    if (files.some(f => f.name === `${ticket.id}.json`)) return;
+    // Check if already added in current run or previously uploaded
+    if (files.some(f => f.name === `${ticket.id}.json`) || existingArtifacts.some(a => a.filename === `${ticket.id}.json`)) return;
 
     const fileContent = JSON.stringify(ticket, null, 2);
     const file = new File([fileContent], `${ticket.id}.json`, { type: 'application/json' });
@@ -190,6 +212,26 @@ export const UploadArtifactsView: React.FC = () => {
         </div>
       )}
 
+      {existingArtifacts.length > 0 && (
+        <div className="mt-4">
+          <h3 className="font-dropdown-label mb-3 font-semibold text-primary-text flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-primary-orange" />
+            Previously Uploaded Artifacts ({existingArtifacts.length})
+          </h3>
+          <ul className="space-y-2">
+            {existingArtifacts.map((art, i) => (
+              <li key={i} className="flex justify-between items-center p-3 border border-light-border rounded bg-card shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary-orange" />
+                  <span className="font-chat-input text-sm font-medium text-primary-text">{art.filename}</span>
+                </div>
+                <span className="text-placeholder text-xs font-mono capitalize px-2 py-0.5 border border-light-border rounded-full bg-input-bg">{art.file_type.toLowerCase().replace('_', ' ')}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Jira Tickets Section */}
       <div className="border border-light-border rounded-lg p-6 bg-card shadow-sm">
         <h3 className="font-dropdown-label text-md font-semibold text-primary-text mb-4 flex items-center gap-2">
@@ -257,12 +299,12 @@ export const UploadArtifactsView: React.FC = () => {
         ) : jiraTickets.length > 0 ? (
           <div className="space-y-3">
             {jiraTickets.map(ticket => {
-              const isSelected = files.some(f => f.name === `${ticket.id}.json`);
+              const isSelected = files.some(f => f.name === `${ticket.id}.json`) || existingArtifacts.some(a => a.filename === `${ticket.id}.json`);
               return (
-                <div key={ticket.id} className={`flex justify-between items-start p-4 border rounded transition-colors ${isSelected ? 'border-green-300 bg-green-50' : 'border-light-border bg-input-bg hover:border-blue-300'}`}>
+                <div key={ticket.id} className={`flex justify-between items-start p-4 border rounded transition-colors ${isSelected ? 'border-orange-300 bg-[#FFEFE6]' : 'border-light-border bg-input-bg hover:border-orange-300'}`}>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">{ticket.id}</span>
+                      <span className="text-xs font-bold bg-orange-100 text-primary-orange px-2 py-0.5 rounded">{ticket.id}</span>
                       <span className="text-xs font-semibold text-gray-500 border border-gray-200 px-2 py-0.5 rounded">{ticket.type}</span>
                     </div>
                     <h4 className="font-semibold text-sm text-primary-text">{ticket.title}</h4>
@@ -271,7 +313,7 @@ export const UploadArtifactsView: React.FC = () => {
                   <button
                     onClick={() => handleSelectTicket(ticket)}
                     disabled={isSelected}
-                    className={`shrink-0 ml-4 flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded transition-colors ${isSelected ? 'bg-green-100 text-green-700 cursor-not-allowed' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'}`}
+                    className={`shrink-0 ml-4 flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded transition-colors ${isSelected ? 'bg-orange-100/80 text-primary-orange cursor-not-allowed' : 'bg-orange-50 text-primary-orange hover:bg-orange-100'}`}
                   >
                     {isSelected ? <CheckCircle2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     {isSelected ? 'Selected' : 'Select'}

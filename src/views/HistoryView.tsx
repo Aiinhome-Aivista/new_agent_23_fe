@@ -53,6 +53,7 @@ export const HistoryView: React.FC = () => {
             <thead>
               <tr className="border-b border-light-border text-secondary-text font-dropdown-label">
                 <th className="py-3 px-4">Session ID</th>
+                <th className="py-3 px-4">Session Name</th>
                 <th className="py-3 px-4">Created At</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Tech Profile</th>
@@ -63,6 +64,9 @@ export const HistoryView: React.FC = () => {
               {sessions.map((s) => (
                 <tr key={s.session_id} className="border-b border-light-border hover:bg-muted">
                   <td className="py-3 px-4 font-mono text-sm">{s.session_id.substring(0, 8)}...</td>
+                  <td className="py-3 px-4 text-sm text-primary-text font-semibold">
+                    {s.tech_profile?.session_name || `${s.tech_profile?.language || 'Unknown'} Suite (${s.tech_profile?.framework || 'Unknown'})`}
+                  </td>
                   <td className="py-3 px-4 text-sm text-secondary-text">
                     {new Date(s.created_at.endsWith('Z') || s.created_at.includes('+') ? s.created_at : s.created_at + 'Z').toLocaleString()}
                   </td>
