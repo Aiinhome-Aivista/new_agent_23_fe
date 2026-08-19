@@ -297,7 +297,7 @@ export const UploadArtifactsView: React.FC = () => {
         {loadingTickets ? (
           <p className="text-sm text-secondary-text">Fetching tickets from Jira...</p>
         ) : jiraTickets.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2">
             {jiraTickets.map(ticket => {
               const isSelected = files.some(f => f.name === `${ticket.id}.json`) || existingArtifacts.some(a => a.filename === `${ticket.id}.json`);
               return (
