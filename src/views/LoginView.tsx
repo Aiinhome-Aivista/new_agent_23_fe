@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Cpu, Lock, Mail, Eye, EyeOff, User, ArrowRight, Loader2 } from 'lucide-react';
 import { useSessionStore } from '../store/useSessionStore';
 import api from '../services/api';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Card } from '../components/ui/Card';
 
 export const LoginView: React.FC = () => {
   const navigate = useNavigate();
@@ -105,7 +108,7 @@ export const LoginView: React.FC = () => {
         </div>
 
         {/* Card Container using Global CSS Design Tokens */}
-        <div className="bg-card border border-light-border rounded-xl p-6 sm:p-8 shadow-sm">
+        <Card className="p-6 sm:p-8 shadow-sm">
           {/* Tab Switcher */}
           <div className="flex bg-muted p-1 rounded-lg mb-6 border border-light-border">
             <button 
@@ -140,13 +143,13 @@ export const LoginView: React.FC = () => {
                 <label className="block text-xs font-semibold text-foreground mb-1.5 font-dropdown-label">Full Name</label>
                 <div className="relative">
                   <User className="w-4 h-4 text-secondary-text absolute left-3 top-2.5" />
-                  <input 
+                  <Input 
                     type="text" 
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Lead Solution Architect"
-                    className="w-full input-custom text-xs pl-9"
+                    className="pl-9"
                   />
                 </div>
               </div>
@@ -156,13 +159,13 @@ export const LoginView: React.FC = () => {
               <label className="block text-xs font-semibold text-foreground mb-1.5 font-dropdown-label">Work Email</label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-secondary-text absolute left-3 top-2.5" />
-                <input 
+                <Input 
                   type="email" 
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="architect@enterprise.com"
-                  className="w-full input-custom text-xs pl-9"
+                  className="pl-9"
                 />
               </div>
             </div>
@@ -171,13 +174,13 @@ export const LoginView: React.FC = () => {
               <label className="block text-xs font-semibold text-foreground mb-1.5 font-dropdown-label">Password</label>
               <div className="relative">
                 <Lock className="w-4 h-4 text-secondary-text absolute left-3 top-2.5" />
-                <input 
+                <Input 
                   type={showPassword ? 'text' : 'password'} 
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full input-custom text-xs pl-9 pr-10"
+                  className="pl-9 pr-10"
                 />
                 <button 
                   type="button"
@@ -189,10 +192,10 @@ export const LoginView: React.FC = () => {
               </div>
             </div>
 
-            <button 
+            <Button 
               type="submit"
               disabled={loading}
-              className="w-full btn-orange text-xs py-3 flex items-center justify-center gap-2 shadow-xs mt-2 disabled:opacity-50"
+              className="w-full text-xs py-3 flex items-center justify-center gap-2 shadow-xs mt-2 disabled:opacity-50"
             >
               {loading ? (
                 <>
@@ -203,7 +206,7 @@ export const LoginView: React.FC = () => {
                   {isRegister ? 'Create Account & Launch' : 'Sign In to Workspace'} <ArrowRight className="w-4 h-4" />
                 </>
               )}
-            </button>
+            </Button>
           </form>
 
           {/* Quick Demo Login Preset Buttons */}
@@ -212,34 +215,41 @@ export const LoginView: React.FC = () => {
               ⚡ Quick One-Click Demo Access:
             </span>
             <div className="grid grid-cols-2 gap-2">
-              <button 
+              <Button 
+                variant="outline"
                 type="button"
                 onClick={() => handleDemoLogin('Solution Architect', 'Alex Morgan', 'alex.architect@enterprise.com')}
-                className="p-2.5 bg-input hover:bg-muted border border-border rounded-lg text-left transition-all"
+                className="h-auto p-2.5 bg-input hover:bg-muted border border-border rounded-lg justify-start text-left"
               >
-                <div className="text-[11px] font-bold text-primary-orange">Lead Architect</div>
-                <div className="text-[9px] text-secondary-text font-mono">alex.architect@...</div>
-              </button>
-              <button 
+                <div>
+                  <div className="text-[11px] font-bold text-primary-orange">Lead Architect</div>
+                  <div className="text-[9px] text-secondary-text font-mono">alex.architect@...</div>
+                </div>
+              </Button>
+              <Button 
+                variant="outline"
                 type="button"
                 onClick={() => handleDemoLogin('QA Lead Manager', 'Sarah Jenkins', 'sarah.qa@enterprise.com')}
-                className="p-2.5 bg-input hover:bg-muted border border-border rounded-lg text-left transition-all"
+                className="h-auto p-2.5 bg-input hover:bg-muted border border-border rounded-lg justify-start text-left"
               >
-                <div className="text-[11px] font-bold text-primary">QA Lead Manager</div>
-                <div className="text-[9px] text-secondary-text font-mono">sarah.qa@...</div>
-              </button>
+                <div>
+                  <div className="text-[11px] font-bold text-primary">QA Lead Manager</div>
+                  <div className="text-[9px] text-secondary-text font-mono">sarah.qa@...</div>
+                </div>
+              </Button>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Return to Landing Page Link */}
         <div className="text-center mt-6">
-          <button 
+          <Button 
+            variant="link"
             onClick={() => navigate('/')} 
-            className="text-xs text-secondary-text hover:text-primary-orange font-medium transition-colors"
+            className="text-xs text-secondary-text hover:text-primary-orange font-medium"
           >
             ← Return to Landing Page
-          </button>
+          </Button>
         </div>
       </div>
     </div>

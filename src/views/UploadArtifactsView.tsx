@@ -2,8 +2,12 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
-import { UploadCloud, CheckCircle2, GitBranch, FolderOpen, Settings2, FileText, Plus } from 'lucide-react';
+import { UploadCloud, CheckCircle2, GitBranch, FolderOpen, Settings2, FileText, Plus, Eye, EyeOff } from 'lucide-react';
 import api from '../services/api';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
 
 interface JiraTicket {
   id: string;
@@ -31,6 +35,7 @@ export const UploadArtifactsView: React.FC = () => {
   const [jiraToken, setJiraToken] = useState(() => localStorage.getItem('jiraToken') || '');
   const [jiraProject, setJiraProject] = useState(() => localStorage.getItem('jiraProject') || '');
   const [jiraStatus, setJiraStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [showJiraToken, setShowJiraToken] = useState(false);
 
   React.useEffect(() => {
     localStorage.setItem('jiraUrl', jiraUrl);
@@ -165,16 +170,16 @@ export const UploadArtifactsView: React.FC = () => {
   };
 
   return (
-    <div className="bg-card rounded shadow-sm border border-light-border p-8 mt-10 max-w-4xl mx-auto space-y-8">
-      <div>
-        <h2 className="font-main-heading mb-2">Upload Requirement & Specification Artifacts</h2>
-        <p className="text-sm text-secondary-text">
+    <Card className="p-8 mt-10 max-w-4xl mx-auto space-y-8 border-light-border shadow-sm">
+      <CardHeader className="p-0">
+        <CardTitle className="font-main-heading text-2xl mb-2">Upload Requirement & Specification Artifacts</CardTitle>
+        <CardDescription className="text-sm text-secondary-text">
           Provide your sprint/story artifacts along with your Git repository to let the AI formulate business rules and generate target unit tests.
-        </p>
-      </div>
+        </CardDescription>
+      </CardHeader>
 
       {errorMsg && (
-        <div className="p-4 border border-red-200 bg-red-50 text-red-700 text-sm rounded-md shadow-sm">
+        <div className="p-4 border border-orange-border bg-input-bg text-primary-orange text-sm rounded-md shadow-sm break-all">
           {errorMsg}
         </div>
       )}
@@ -202,7 +207,7 @@ export const UploadArtifactsView: React.FC = () => {
             {files.map((file, i) => (
               <li key={i} className="flex justify-between items-center p-3 border border-light-border rounded bg-input-bg">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  <CheckCircle2 className="w-4 h-4 text-primary-orange" />
                   <span className="font-chat-input text-sm font-medium text-primary-text">{file.name}</span>
                 </div>
                 <span className="text-placeholder text-xs font-mono">{(file.size / 1024).toFixed(1)} KB</span>
@@ -235,63 +240,69 @@ export const UploadArtifactsView: React.FC = () => {
       {/* Jira Tickets Section */}
       <div className="border border-light-border rounded-lg p-6 bg-card shadow-sm">
         <h3 className="font-dropdown-label text-md font-semibold text-primary-text mb-4 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-blue-500" />
+          <FileText className="w-5 h-5 text-primary-orange" />
           Connect Jira & Sync Tickets
           {jiraStatus === 'success' && <span className="ml-2 flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-100 border border-green-300 px-2 py-0.5 rounded-full"><CheckCircle2 className="w-3 h-3" /> Connected</span>}
-          {jiraStatus === 'error' && <span className="ml-2 flex items-center gap-1 text-[11px] font-bold text-red-700 bg-red-100 border border-red-300 px-2 py-0.5 rounded-full">Connection Failed</span>}
+          {jiraStatus === 'error' && <span className="ml-2 flex items-center gap-1 text-[11px] font-bold text-primary-orange bg-input-bg border border-orange-border px-2 py-0.5 rounded-full">Connection Failed</span>}
         </h3>
         
         <div className="space-y-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-secondary-text mb-1">Jira Instance URL</label>
-              <input
+              <Input
                 type="text"
                 placeholder="e.g. https://your-domain.atlassian.net"
                 value={jiraUrl}
                 onChange={(e) => setJiraUrl(e.target.value)}
-                className="w-full input-custom text-sm"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-secondary-text mb-1">Project Name (or Key)</label>
-              <input
+              <Input
                 type="text"
                 placeholder="e.g. PROJ or My Project"
                 value={jiraProject}
                 onChange={(e) => setJiraProject(e.target.value)}
-                className="w-full input-custom text-sm"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-secondary-text mb-1">Email Address</label>
-              <input
+              <Input
                 type="email"
                 placeholder="e.g. your-email@company.com"
                 value={jiraEmail}
                 onChange={(e) => setJiraEmail(e.target.value)}
-                className="w-full input-custom text-sm"
               />
             </div>
             <div>
               <label className="block text-xs font-semibold text-secondary-text mb-1">API Token</label>
-              <input
-                type="password"
-                placeholder="Your Jira API Token"
-                value={jiraToken}
-                onChange={(e) => setJiraToken(e.target.value)}
-                className="w-full input-custom text-sm"
-              />
+              <div className="relative">
+                <Input
+                  type={showJiraToken ? "text" : "password"}
+                  placeholder="Your Jira API Token"
+                  value={jiraToken}
+                  onChange={(e) => setJiraToken(e.target.value)}
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowJiraToken(!showJiraToken)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-text hover:text-primary-text"
+                >
+                  {showJiraToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
           </div>
-          <button 
+          <Button 
             type="button" 
+            variant="outline"
             onClick={fetchTickets}
             disabled={loadingTickets}
-            className="btn-outline border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 disabled:opacity-50"
           >
             {loadingTickets ? 'Connecting & Syncing...' : 'Connect'}
-          </button>
+          </Button>
         </div>
 
         {loadingTickets ? (
@@ -301,23 +312,25 @@ export const UploadArtifactsView: React.FC = () => {
             {jiraTickets.map(ticket => {
               const isSelected = files.some(f => f.name === `${ticket.id}.json`) || existingArtifacts.some(a => a.filename === `${ticket.id}.json`);
               return (
-                <div key={ticket.id} className={`flex justify-between items-start p-4 border rounded transition-colors ${isSelected ? 'border-orange-300 bg-[#FFEFE6]' : 'border-light-border bg-input-bg hover:border-orange-300'}`}>
+                <div key={ticket.id} className={`flex justify-between items-start p-4 border rounded transition-colors ${isSelected ? 'border-orange-border bg-input-bg' : 'border-light-border bg-card hover:border-orange-border'}`}>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold bg-orange-100 text-primary-orange px-2 py-0.5 rounded">{ticket.id}</span>
-                      <span className="text-xs font-semibold text-gray-500 border border-gray-200 px-2 py-0.5 rounded">{ticket.type}</span>
+                      <span className="text-xs font-bold bg-input-bg border border-orange-border text-primary-orange px-2 py-0.5 rounded">{ticket.id}</span>
+                      <span className="text-xs font-semibold text-secondary-text border border-light-border px-2 py-0.5 rounded">{ticket.type}</span>
                     </div>
                     <h4 className="font-semibold text-sm text-primary-text">{ticket.title}</h4>
                     <p className="text-xs text-secondary-text mt-1 line-clamp-2">{ticket.description}</p>
                   </div>
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleSelectTicket(ticket)}
                     disabled={isSelected}
-                    className={`shrink-0 ml-4 flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded transition-colors ${isSelected ? 'bg-orange-100/80 text-primary-orange cursor-not-allowed' : 'bg-orange-50 text-primary-orange hover:bg-orange-100'}`}
+                    className="shrink-0 ml-4"
                   >
-                    {isSelected ? <CheckCircle2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                    {isSelected ? <CheckCircle2 className="w-4 h-4 mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
                     {isSelected ? 'Selected' : 'Select'}
-                  </button>
+                  </Button>
                 </div>
               );
             })}
@@ -388,18 +401,18 @@ export const UploadArtifactsView: React.FC = () => {
       </div>
 
       {/* Footer / Submit Section */}
-      <div className="pt-4 flex justify-between items-center border-t border-light-border">
+      <CardFooter className="pt-4 px-0 pb-0 flex justify-between items-center border-t border-light-border">
         <span className="text-xs text-secondary-text">
           {uploading ? `Processing file ${uploadedCount} of ${files.length}...` : `${files.length} file(s) ready for decomposition.`}
         </span>
-        <button 
+        <Button 
           onClick={handleDecompose} 
           disabled={(files.length === 0 && !gitUrl) || uploading} 
-          className="btn-orange disabled:opacity-50"
+          className="uppercase font-bold"
         >
           {uploading ? 'Parsing & Decomposing...' : 'Start Decomposition Pipeline'}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </CardFooter>
+    </Card>
   );
 };

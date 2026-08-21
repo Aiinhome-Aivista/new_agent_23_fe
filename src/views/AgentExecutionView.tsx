@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
 import { useAgentStream } from '../hooks/useAgentStream';
 import { Terminal } from 'lucide-react';
+import { Card } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
 
 export const AgentExecutionView: React.FC = () => {
   const { id } = useParams();
@@ -16,16 +18,16 @@ export const AgentExecutionView: React.FC = () => {
   };
 
   return (
-    <div className="mt-6 flex flex-col h-[calc(100vh-140px)] bg-card rounded-lg border border-light-border overflow-hidden">
+    <Card className="mt-6 flex flex-col h-[calc(100vh-140px)] overflow-hidden shadow-sm border-light-border">
       <div className="bg-muted px-4 py-3 flex justify-between items-center border-b border-light-border">
         <div className="flex items-center gap-2 text-primary-foreground">
           <Terminal className="w-5 h-5 text-button-orange" />
           <span className="font-bold">Agent Execution Terminal</span>
           {isStreaming && <span className="ml-2 w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>}
         </div>
-        <button onClick={handleProceed} className="btn-orange text-xs py-1 px-3">
+        <Button size="sm" onClick={handleProceed} className="text-xs">
           Skip to Workspace
-        </button>
+        </Button>
       </div>
       <div className="flex-1 overflow-y-auto p-4 font-mono text-sm text-[#A9B7C6] whitespace-pre-wrap">
         {logs.length === 0 ? (
@@ -36,6 +38,6 @@ export const AgentExecutionView: React.FC = () => {
           ))
         )}
       </div>
-    </div>
+    </Card>
   );
 };

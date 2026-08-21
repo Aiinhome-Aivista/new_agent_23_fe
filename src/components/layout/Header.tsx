@@ -38,16 +38,16 @@ export const Header: React.FC = () => {
         </button>
 
         {sessionId && (
-          <div className="bg-orange-50 border border-orange-200 px-3 py-1 rounded-full flex items-center gap-1.5">
+          <div className="bg-input border border-border-orange px-3 py-1 rounded-full flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            <span className="font-mono text-xs font-bold text-orange-950">Session: {sessionId.slice(0, 8)}...</span>
+            <span className="font-mono text-xs font-bold text-foreground">Session: {sessionId.slice(0, 8)}...</span>
           </div>
         )}
 
         {isAuthenticated && user && (
           <div className="flex items-center gap-3 border-l border-light-border pl-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-primary-foreground font-bold text-xs shadow-xs">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs shadow-sm">
                 {user.name.charAt(0)}
               </div>
               <div className="hidden md:block">
@@ -58,7 +58,7 @@ export const Header: React.FC = () => {
             <button 
               onClick={handleLogout}
               title="Sign Out"
-              className="p-2 text-secondary-text hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="p-2 text-secondary-text hover:text-red-500 hover:bg-input rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>

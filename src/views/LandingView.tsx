@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { useSessionStore } from '../store/useSessionStore';
 import { useThemeStore } from '../store/useThemeStore';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { Badge } from '../components/ui/Badge';
 
 export const LandingView: React.FC = () => {
  const navigate = useNavigate();
@@ -44,9 +47,9 @@ export const LandingView: React.FC = () => {
  </div>
  <div>
  <span className="font-logo-title text-primary-orange">Unit-Test Case Generator Agent</span>
- <span className="text-[11px] bg-input text-primary-orange font-mono font-bold px-2 py-0.5 rounded border border-orange-border ml-2">
+ <Badge variant="outline" className="text-[11px] bg-input text-primary-orange font-mono font-bold px-2 py-0.5 rounded border border-orange-border ml-2">
  v1.0 Enterprise
- </span>
+ </Badge>
  </div>
  </div>
 
@@ -58,39 +61,42 @@ export const LandingView: React.FC = () => {
  </div>
 
  <div className="flex items-center gap-4">
- <button
+ <Button
+ variant="ghost"
+ size="icon"
  onClick={toggleTheme}
- className="p-2 rounded-full hover:bg-muted text-secondary-text transition-colors"
+ className="rounded-full text-secondary-text"
  title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
  >
  {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
- </button>
+ </Button>
  {isAuthenticated ? (
  <div className="flex items-center gap-3">
  <span className="text-xs text-secondary-text font-mono hidden sm:inline-block">
  Logged in as <strong className="text-primary-orange">{user?.name}</strong>
  </span>
- <button 
+ <Button 
  onClick={() => navigate('/new-session')} 
- className="btn-orange flex items-center gap-2 shadow-xs text-xs py-2 px-4"
+ className="flex items-center gap-2 shadow-xs text-xs py-2 px-4"
  >
  Launch Workspace <ArrowRight className="w-4 h-4" />
- </button>
+ </Button>
  </div>
  ) : (
  <div className="flex items-center gap-3">
- <button 
+ <Button 
+ variant="ghost"
  onClick={() => navigate('/login')} 
- className="text-xs font-semibold text-secondary-text hover:text-foreground px-3 py-2 transition-colors"
+ className="text-xs font-semibold text-secondary-text hover:text-foreground"
  >
  Sign In
- </button>
- <button 
+ </Button>
+ <Button 
  onClick={() => navigate('/login')} 
- className="btn-orange flex items-center gap-2 shadow-xs text-xs py-2 px-4"
+ className="flex items-center gap-2 shadow-xs text-xs py-2 px-4"
  >
  Get Started <ArrowRight className="w-4 h-4" />
- </button>
+ </Button>
  </div>
  )}
  </div>
@@ -117,18 +123,21 @@ export const LandingView: React.FC = () => {
  </p>
 
  <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-14">
- <button 
+ <Button 
+ size="lg"
  onClick={handleGetStarted}
- className="btn-orange text-sm px-8 py-3.5 shadow-md flex items-center justify-center gap-3 rounded-lg transform hover:-translate-y-0.5"
+ className="text-sm px-8 shadow-md flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
  >
  <Zap className="w-5 h-5" /> Start Test Case Generation Now <ArrowRight className="w-5 h-5" />
- </button>
- <button 
+ </Button>
+ <Button 
+ variant="outline"
+ size="lg"
  onClick={() => navigate('/login')}
- className="bg-card hover:bg-muted text-foreground font-semibold text-sm px-6 py-3.5 rounded-lg border border-light-border shadow-xs transition-all flex items-center justify-center gap-2"
+ className="font-semibold text-sm px-6 shadow-xs flex items-center justify-center gap-2"
  >
  <Users className="w-4 h-4 text-primary-orange" /> Try Demo Login
- </button>
+ </Button>
  </div>
 
  {/* Quick Metrics Bar using Global Tokens */}
@@ -311,12 +320,14 @@ public class UserServiceTest {
  <p className="text-orange-100 max-w-xl mx-auto text-xs sm:text-sm mb-6">
  Upload your BRD, OpenAPI YAML, or SQL schemas and watch 7 specialist agents produce AAA test suites in seconds.
  </p>
- <button 
+ <Button 
+ variant="secondary"
+ size="lg"
  onClick={handleGetStarted}
- className="bg-card text-primary-orange hover:bg-muted font-bold text-xs px-8 py-3 rounded-lg shadow-sm transition-all inline-flex items-center gap-2"
+ className="font-bold text-xs px-8 shadow-sm inline-flex items-center gap-2 text-primary-orange bg-card hover:bg-muted"
  >
  Launch Agent Generator <ChevronRight className="w-4 h-4" />
- </button>
+ </Button>
  </div>
  </section>
 
