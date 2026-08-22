@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cpu, Lock, Mail, Eye, EyeOff, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Cpu, Lock, Mail, Eye, EyeOff, User, ArrowRight } from 'lucide-react';
 import { useSessionStore } from '../store/useSessionStore';
 import api from '../services/api';
 import { Button } from '../components/ui/Button';
@@ -194,18 +194,11 @@ export const LoginView: React.FC = () => {
 
             <Button 
               type="submit"
-              disabled={loading}
-              className="w-full text-xs py-3 flex items-center justify-center gap-2 shadow-xs mt-2 disabled:opacity-50"
+              isLoading={loading}
+              rightIcon={<ArrowRight className="w-4 h-4" />}
+              className="w-full text-xs py-3 shadow-xs mt-2"
             >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Authenticating...
-                </>
-              ) : (
-                <>
-                  {isRegister ? 'Create Account & Launch' : 'Sign In to Workspace'} <ArrowRight className="w-4 h-4" />
-                </>
-              )}
+              {loading ? 'Authenticating...' : (isRegister ? 'Create Account & Launch' : 'Sign In to Workspace')}
             </Button>
           </form>
 

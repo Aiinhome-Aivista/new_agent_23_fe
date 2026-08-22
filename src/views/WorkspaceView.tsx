@@ -666,13 +666,13 @@ export const WorkspaceView: React.FC = () => {
   return (
     <div className="mt-2 flex flex-col h-[calc(100vh-100px)] relative font-sans">
       {/* Top Header & Coverage Metrics Dashboard */}
-      <div className="bg-card border border-light-border rounded-lg p-4 mb-4 shadow-xs flex justify-between items-center">
+      <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-xs flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-            <Code2 className="w-7 h-7 text-primary-orange" />
+          <div className="p-3 bg-input border border-border rounded-lg">
+            <Code2 className="w-7 h-7 text-primary" />
           </div>
           <div>
-            <h2 className="font-bold text-lg text-primary-text flex items-center gap-2">
+            <h2 className="font-bold text-lg text-foreground flex items-center gap-2">
               Generated Unit Test Review Workspace
               <Badge variant="success" className="font-mono text-[10px]">100% COVERED</Badge>
             </h2>
@@ -706,16 +706,16 @@ export const WorkspaceView: React.FC = () => {
       {/* Main Split Content Workspace */}
       <div className="flex flex-1 gap-4 overflow-hidden">
         {/* Left Side: Traceability Matrix & Review Agent Audit */}
-        <div className="w-1/3 bg-white border border-light-border rounded-lg flex flex-col overflow-hidden shadow-xs">
+        <div className="w-1/3 bg-card border border-light-border rounded-lg flex flex-col overflow-hidden shadow-xs">
           
           {/* Tabs Header */}
-          <div className="flex border-b border-light-border bg-input-bg">
+          <div className="flex border-b border-border bg-input">
             <button
               onClick={() => setActiveTab('matrix')}
               className={`flex-1 py-3 px-4 text-xs font-bold transition-all text-center border-b-2 ${
                 activeTab === 'matrix'
-                  ? 'border-primary-orange text-primary-orange bg-white'
-                  : 'border-transparent text-text-secondary hover:text-text-primary hover:bg-gray-50/50'
+                  ? 'border-primary text-primary bg-card'
+                  : 'border-transparent text-secondary-text hover:text-foreground hover:bg-muted'
               }`}
             >
               Traceability Matrix
@@ -724,8 +724,8 @@ export const WorkspaceView: React.FC = () => {
               onClick={() => setActiveTab('audit')}
               className={`flex-1 py-3 px-4 text-xs font-bold transition-all text-center border-b-2 flex items-center justify-center gap-1.5 ${
                 activeTab === 'audit'
-                  ? 'border-primary-orange text-primary-orange bg-white'
-                  : 'border-transparent text-text-secondary hover:text-text-primary hover:bg-gray-50/50'
+                  ? 'border-primary text-primary bg-card'
+                  : 'border-transparent text-secondary-text hover:text-foreground hover:bg-muted'
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5" />
@@ -736,8 +736,8 @@ export const WorkspaceView: React.FC = () => {
           {activeTab === 'matrix' ? (
             <>
               {/* Test Suite Selector Tabs */}
-              <div className="p-3 border-b border-light-border bg-gray-50/80">
-                <span className="text-[11px] font-bold text-text-secondary uppercase mb-2 block tracking-wider">Test Suite Files:</span>
+              <div className="p-3 border-b border-border bg-card">
+                <span className="text-[11px] font-bold text-secondary-text uppercase mb-2 block tracking-wider">Test Suite Files:</span>
                 <div className="space-y-2">
                   {testFiles.map((tf) => {
                     const isSelected = tf.test_name === selectedFileName;
@@ -749,12 +749,12 @@ export const WorkspaceView: React.FC = () => {
                         onClick={() => handleSelectFile(tf.test_name)}
                         className={`w-full text-left p-2.5 rounded-md flex justify-between items-center border transition-all text-xs font-mono ${
                           isSelected 
-                            ? 'border-primary-orange bg-orange-50 font-bold text-orange-950 shadow-xs' 
-                            : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
+                            ? 'border-primary bg-input font-bold text-foreground shadow-sm' 
+                            : 'border-border bg-card hover:bg-muted text-secondary-text hover:text-foreground'
                         }`}
                       >
                         <div className="flex items-center gap-2">
-                          <FileCode className={`w-4 h-4 ${isSelected ? 'text-primary-orange' : 'text-gray-500'}`} />
+                          <FileCode className={`w-4 h-4 ${isSelected ? 'text-primary' : 'text-secondary-text'}`} />
                           <span>{tf.test_name}</span>
                         </div>
                         <Badge variant={isAmbiguous ? 'warning' : 'success'} className="text-[10px] px-2 py-0.5 font-bold">

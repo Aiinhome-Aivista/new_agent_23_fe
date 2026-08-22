@@ -18,18 +18,18 @@ export const AgentExecutionView: React.FC = () => {
   };
 
   return (
-    <Card className="mt-6 flex flex-col h-[calc(100vh-140px)] overflow-hidden shadow-sm border-light-border">
+    <Card className="flex flex-col h-[80vh] overflow-hidden shadow-sm border-light-border">
       <div className="bg-muted px-4 py-3 flex justify-between items-center border-b border-light-border">
         <div className="flex items-center gap-2 text-primary-foreground">
           <Terminal className="w-5 h-5 text-button-orange" />
-          <span className="font-bold">Agent Execution Terminal</span>
+          <span className="font-bold text-card-foreground">Agent Execution Terminal</span>
           {isStreaming && <span className="ml-2 w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>}
         </div>
         <Button size="sm" onClick={handleProceed} className="text-xs">
           Skip to Workspace
         </Button>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 font-mono text-sm text-[#A9B7C6] whitespace-pre-wrap">
+      <div className="flex-1 overflow-y-auto p-4 font-mono text-sm text-foreground whitespace-pre-wrap">
         {logs.length === 0 ? (
           <p className="text-placeholder italic">Waiting for agent traces...</p>
         ) : (

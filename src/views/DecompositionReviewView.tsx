@@ -130,7 +130,7 @@ export const DecompositionReviewView: React.FC = () => {
   }
 
   return (
-    <div className="mt-6 flex flex-col h-[calc(100vh-140px)]">
+    <div className="flex flex-col h-[80vh]">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="font-main-heading">Requirement & Service Decomposition Review</h2>
@@ -175,7 +175,7 @@ export const DecompositionReviewView: React.FC = () => {
                 <span className="text-xs font-semibold text-secondary-text uppercase">Target Methods:</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {srv.methods?.map((m, mi) => (
-                    <span key={mi} className="text-xs font-mono bg-muted text-primary-text px-2 py-0.5 rounded border border-light-border">{m}()</span>
+                    <span key={mi} className="text-xs font-mono bg-muted text-foreground px-2 py-0.5 rounded border border-border">{m}()</span>
                   ))}
                 </div>
               </div>
@@ -183,7 +183,7 @@ export const DecompositionReviewView: React.FC = () => {
                 <span className="text-xs font-semibold text-secondary-text uppercase">Mocked Collaborators:</span>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {srv.dependencies?.map((d, di) => (
-                    <span key={di} className="text-xs font-mono bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">@{d}</span>
+                    <span key={di} className="text-xs font-mono bg-secondary text-secondary-foreground px-2 py-0.5 rounded border border-transparent">@{d}</span>
                   ))}
                 </div>
               </div>
