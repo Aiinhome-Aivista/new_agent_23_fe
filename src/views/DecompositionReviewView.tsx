@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, PlusCircle } from 'lucide-react';
 import api from '../services/api';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -30,6 +30,21 @@ export const DecompositionReviewView: React.FC = () => {
   const [services, setServices] = useState<ServiceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeElapsed, setTimeElapsed] = useState(0);
+
+  const [isAddingRule, setIsAddingRule] = useState(false);
+  const [newRule, setNewRule] = useState({ rule_code: '', rule_text: '', rule_type: 'BUSINESS_RULE' });
+
+  const handleAddRule = async () => {
+    if (!newRule.rule_code || !newRule.rule_text) return;
+    try {
+      await api.post(`/sessions/${id}/decompositions`, newRule);
+      setRules(prev => [...prev, newRule as DecompositionItem]);
+      setNewRule({ rule_code: '', rule_text: '', rule_type: 'BUSINESS_RULE' });
+      setIsAddingRule(false);
+    } catch (error) {
+      console.error("Failed to add rule", error);
+    }
+  };
 
   useEffect(() => {
     let intervalId: any;
@@ -146,8 +161,49 @@ export const DecompositionReviewView: React.FC = () => {
         <Card className="p-5 overflow-y-auto shadow-sm border-light-border">
           <h3 className="font-dropdown-label border-b border-light-border pb-3 mb-4 text-primary-orange flex justify-between items-center">
             <span>Extracted Business Rules & Acceptance Criteria</span>
-            <Badge variant="warning" className="text-xs px-2 py-0.5 font-mono">{rules.length} Rules</Badge>
+            <div className="flex gap-2">
+              <Button size="sm" variant="secondary" onClick={() => setIsAddingRule(!isAddingRule)} className="text-xs px-2 py-0.5 h-auto" leftIcon={<PlusCircle className="w-3 h-3" />}>
+                Add Rule
+              </Button>
+              <Badge variant="warning" className="text-xs px-2 py-0.5 font-mono">{rules.length} Rules</Badge>
+            </div>
           </h3>
+          
+          {isAddingRule && (
+            <div className="p-4 bg-secondary border border-primary-orange rounded-md mb-4 shadow-inner">
+              <h4 className="text-sm font-bold text-primary-text mb-2">Add Custom Rule</h4>
+              <div className="flex gap-2 mb-2">
+                <input 
+                  type="text" 
+                  placeholder="BR-XXX" 
+                  className="bg-card text-primary-text text-sm rounded border border-border p-1 w-1/4"
+                  value={newRule.rule_code}
+                  onChange={(e) => setNewRule({...newRule, rule_code: e.target.value})}
+                />
+                <select 
+                  className="bg-card text-primary-text text-sm rounded border border-border p-1 flex-1"
+                  value={newRule.rule_type}
+                  onChange={(e) => setNewRule({...newRule, rule_type: e.target.value})}
+                >
+                  <option value="BUSINESS_RULE">BUSINESS_RULE</option>
+                  <option value="VALIDATION_RULE">VALIDATION_RULE</option>
+                  <option value="SECURITY_RULE">SECURITY_RULE</option>
+                  <option value="AUTHORIZATION_RULE">AUTHORIZATION_RULE</option>
+                </select>
+              </div>
+              <textarea 
+                placeholder="Rule Details..." 
+                className="bg-card text-primary-text text-sm rounded border border-border p-2 w-full mb-2 h-20"
+                value={newRule.rule_text}
+                onChange={(e) => setNewRule({...newRule, rule_text: e.target.value})}
+              />
+              <div className="flex justify-end gap-2">
+                <Button size="sm" variant="secondary" onClick={() => setIsAddingRule(false)}>Cancel</Button>
+                <Button size="sm" onClick={handleAddRule}>Save Rule</Button>
+              </div>
+            </div>
+          )}
+
           {rules.map((rule, idx) => (
             <div key={idx} className="p-4 bg-card border border-border rounded-md mb-3 hover:border-orange-border transition-all">
               <div className="flex justify-between items-center mb-1">

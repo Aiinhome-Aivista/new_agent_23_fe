@@ -115,12 +115,18 @@ export const UploadArtifactsView: React.FC = () => {
   }, [id]);
 
   const handleSelectTicket = (ticket: JiraTicket) => {
-    // Check if already added in current run or previously uploaded
-    if (files.some(f => f.name === `${ticket.id}.json`) || existingArtifacts.some(a => a.filename === `${ticket.id}.json`)) return;
+    // Check if already in existingArtifacts (cannot unselect from UI without backend call)
+    if (existingArtifacts.some(a => a.filename === `${ticket.id}.json`)) return;
 
-    const fileContent = JSON.stringify(ticket, null, 2);
-    const file = new File([fileContent], `${ticket.id}.json`, { type: 'application/json' });
-    setFiles(prev => [...prev, file]);
+    const isFileSelected = files.some(f => f.name === `${ticket.id}.json`);
+    
+    if (isFileSelected) {
+      setFiles(prev => prev.filter(f => f.name !== `${ticket.id}.json`));
+    } else {
+      const fileContent = JSON.stringify(ticket, null, 2);
+      const file = new File([fileContent], `${ticket.id}.json`, { type: 'application/json' });
+      setFiles(prev => [...prev, file]);
+    }
   };
 
   // Git Configuration State
@@ -325,10 +331,10 @@ export const UploadArtifactsView: React.FC = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleSelectTicket(ticket)}
-                    disabled={isSelected}
+                    disabled={existingArtifacts.some(a => a.filename === `${ticket.id}.json`)}
                     className="shrink-0 ml-4"
+                    leftIcon={isSelected ? <CheckCircle2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                   >
-                    {isSelected ? <CheckCircle2 className="w-4 h-4 mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
                     {isSelected ? 'Selected' : 'Select'}
                   </Button>
                 </div>
