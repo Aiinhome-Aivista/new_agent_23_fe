@@ -7,7 +7,10 @@ import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '../components/ui/Card';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 8981c005276d770f5601c359b938c8c00d63c14a
 interface JiraTicket {
   id: string;
   title: string;
@@ -29,19 +32,39 @@ export const UploadArtifactsView: React.FC = () => {
   // Jira State
   const [jiraTickets, setJiraTickets] = useState<JiraTicket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(false);
-  const [jiraUrl, setJiraUrl] = useState(() => localStorage.getItem('jiraUrl') || '');
-  const [jiraEmail, setJiraEmail] = useState(() => localStorage.getItem('jiraEmail') || '');
-  const [jiraToken, setJiraToken] = useState(() => localStorage.getItem('jiraToken') || '');
-  const [jiraProject, setJiraProject] = useState(() => localStorage.getItem('jiraProject') || '');
+  const [jiraUrl, setJiraUrl] = useState(() => {
+    const val = localStorage.getItem(`jiraUrl_${id}`);
+    return val !== null ? val : (localStorage.getItem('jiraUrl') || '');
+  });
+  const [jiraEmail, setJiraEmail] = useState(() => {
+    const val = localStorage.getItem(`jiraEmail_${id}`);
+    return val !== null ? val : (localStorage.getItem('jiraEmail') || '');
+  });
+  const [jiraToken, setJiraToken] = useState(() => {
+    const val = localStorage.getItem(`jiraToken_${id}`);
+    return val !== null ? val : (localStorage.getItem('jiraToken') || '');
+  });
+  const [jiraProject, setJiraProject] = useState(() => {
+    const val = localStorage.getItem(`jiraProject_${id}`);
+    return val !== null ? val : (localStorage.getItem('jiraProject') || '');
+  });
   const [jiraStatus, setJiraStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [showJiraToken, setShowJiraToken] = useState(false);
 
   React.useEffect(() => {
-    localStorage.setItem('jiraUrl', jiraUrl);
-    localStorage.setItem('jiraEmail', jiraEmail);
-    localStorage.setItem('jiraToken', jiraToken);
-    localStorage.setItem('jiraProject', jiraProject);
-  }, [jiraUrl, jiraEmail, jiraToken, jiraProject]);
+    if (!id) return;
+    localStorage.setItem(`jiraUrl_${id}`, jiraUrl);
+    localStorage.setItem(`jiraEmail_${id}`, jiraEmail);
+    localStorage.setItem(`jiraToken_${id}`, jiraToken);
+    localStorage.setItem(`jiraProject_${id}`, jiraProject);
+
+    if (jiraUrl && jiraEmail && jiraToken && jiraProject) {
+      localStorage.setItem('jiraUrl', jiraUrl);
+      localStorage.setItem('jiraEmail', jiraEmail);
+      localStorage.setItem('jiraToken', jiraToken);
+      localStorage.setItem('jiraProject', jiraProject);
+    }
+  }, [jiraUrl, jiraEmail, jiraToken, jiraProject, id]);
 
   const fetchTickets = async () => {
     let correctedUrl = jiraUrl.trim();
@@ -83,6 +106,19 @@ export const UploadArtifactsView: React.FC = () => {
     } finally {
       setLoadingTickets(false);
     }
+  };
+
+  const handleDisconnect = () => {
+    // Remove files created from Jira tickets
+    setFiles(prev => prev.filter(f => !jiraTickets.some(t => f.name === `${t.id}.json`)));
+    
+    // Reset credentials and states
+    setJiraUrl('');
+    setJiraEmail('');
+    setJiraToken('');
+    setJiraProject('');
+    setJiraTickets([]);
+    setJiraStatus('idle');
   };
 
   React.useEffect(() => {
@@ -416,14 +452,25 @@ export const UploadArtifactsView: React.FC = () => {
               </div>
             </div>
           </div>
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={fetchTickets}
-            disabled={loadingTickets}
-          >
-            {loadingTickets ? 'Connecting & Syncing...' : 'Connect'}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={fetchTickets}
+              disabled={loadingTickets}
+            >
+              {loadingTickets ? 'Connecting & Syncing...' : jiraStatus === 'success' ? 'Sync Tickets' : 'Connect'}
+            </Button>
+            {jiraStatus === 'success' && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDisconnect}
+              >
+                Disconnect
+              </Button>
+            )}
+          </div>
         </div>
 
         {loadingTickets ? (
