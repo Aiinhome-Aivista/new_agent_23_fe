@@ -20,7 +20,6 @@ import {
 import { useSessionStore } from '../store/useSessionStore';
 import { useThemeStore } from '../store/useThemeStore';
 import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 
 export const LandingView: React.FC = () => {
