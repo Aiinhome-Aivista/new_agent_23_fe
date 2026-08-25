@@ -7,6 +7,7 @@ import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '../components/ui/Card';
+import { PrivateGitModal } from '../components/modals/PrivateGitModal';
 interface JiraTicket {
   id: string;
   title: string;
@@ -202,6 +203,7 @@ export const UploadArtifactsView: React.FC = () => {
   const [gitBranch, setGitBranch] = useState('');
   const [gitPath, setGitPath] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showPrivateModal, setShowPrivateModal] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles((prev) => [...prev, ...acceptedFiles]);
@@ -209,7 +211,7 @@ export const UploadArtifactsView: React.FC = () => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  const handleDecompose = async () => {
+  const proceedDecompose = async (validatedGitUrl?: string) => {
     if (!id) return;
     setUploading(true);
     setErrorMsg(null);
@@ -225,9 +227,11 @@ export const UploadArtifactsView: React.FC = () => {
         setUploadedCount(i + 1);
       }
       
+      const finalGitUrl = validatedGitUrl || gitUrl.trim();
+
       // Trigger background decomposition & agent graph with Git metadata
       await api.post(`/sessions/${id}/decompose`, {
-        git_url: gitUrl.trim() || null,
+        git_url: finalGitUrl || null,
         git_branch: gitBranch.trim() || null,
         git_path: gitPath.trim() || null
       });
@@ -239,6 +243,36 @@ export const UploadArtifactsView: React.FC = () => {
       const backendError = error.response?.data?.detail || "Failed to validate Git Repository URL or authentication token. Please verify.";
       setErrorMsg(backendError);
     } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDecompose = async () => {
+    if (!gitUrl.trim()) {
+      await proceedDecompose();
+      return;
+    }
+
+    setUploading(true);
+    setErrorMsg(null);
+    try {
+      const response = await api.post('/sessions/check-git-repo', {
+        git_url: gitUrl.trim(),
+      });
+
+      if (response.data.status === 'public') {
+        await proceedDecompose();
+      } else if (response.data.status === 'private') {
+        setUploading(false);
+        setShowPrivateModal(true);
+      } else {
+        setErrorMsg(response.data.message || 'Failed to validate Git Repository URL.');
+        setUploading(false);
+      }
+    } catch (error: any) {
+      console.error("Git check error:", error);
+      const backendError = error.response?.data?.detail || "Failed to connect to the Git Repository URL. Please verify.";
+      setErrorMsg(backendError);
       setUploading(false);
     }
   };
@@ -577,6 +611,16 @@ export const UploadArtifactsView: React.FC = () => {
           {uploading ? 'Parsing & Decomposing...' : 'Start Decomposition Pipeline'}
         </Button>
       </CardFooter>
+      <PrivateGitModal
+        isOpen={showPrivateModal}
+        onClose={() => setShowPrivateModal(false)}
+        gitUrl={gitUrl}
+        onValidated={async (authUrl) => {
+          setShowPrivateModal(false);
+          setGitUrl(authUrl);
+          await proceedDecompose(authUrl);
+        }}
+      />
     </Card>
   );
 };
