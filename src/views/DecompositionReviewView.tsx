@@ -56,8 +56,8 @@ export const DecompositionReviewView: React.FC = () => {
         } else {
           seconds += 2;
           setTimeElapsed(seconds);
-          if (seconds >= 90) {
-            setLoading(false); // Stop loading after 90s timeout
+          if (seconds >= 180) {
+            setLoading(false); // Stop loading after 180s timeout
             clearInterval(intervalId);
           }
         }
@@ -65,7 +65,7 @@ export const DecompositionReviewView: React.FC = () => {
         console.error("Error fetching decomposition data:", e);
         seconds += 2;
         setTimeElapsed(seconds);
-        if (seconds >= 90) {
+        if (seconds >= 180) {
           setLoading(false);
           clearInterval(intervalId);
         }
