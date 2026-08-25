@@ -3,7 +3,7 @@ export interface TechProfile {
   language: string;
   framework: string;
   mockLibrary: string;
-  version: string;
+  version?: string;
   codingStandard?: string;
   gitRepo?: string;
 }

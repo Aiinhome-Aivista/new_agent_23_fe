@@ -2,12 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
-import { UploadCloud, CheckCircle2, GitBranch, FolderOpen, Settings2, FileText, Plus, Eye, EyeOff } from 'lucide-react';
+import { UploadCloud, CheckCircle2, GitBranch, FolderOpen, Settings2, FileText, Plus, Eye, EyeOff, Cpu, Check, X } from 'lucide-react';
 import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '../components/ui/Card';
-import { Badge } from '../components/ui/Badge';
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '../components/ui/Card';
 
 interface JiraTicket {
   id: string;
@@ -93,6 +92,39 @@ export const UploadArtifactsView: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [techProfile, setTechProfile] = useState<any>({ language: 'Java', framework: 'JUnit 5', mockLibrary: 'Mockito' });
+  const [showEditStack, setShowEditStack] = useState(false);
+  const [tempLang, setTempLang] = useState('Java');
+  const [tempFramework, setTempFramework] = useState('JUnit 5');
+  const [tempMock, setTempMock] = useState('Mockito');
+
+  const STACK_OPTIONS: Record<string, { frameworks: string[]; mocks: string[] }> = {
+    Java: { frameworks: ['JUnit 5', 'JUnit 4', 'TestNG'], mocks: ['Mockito', 'EasyMock'] },
+    Python: { frameworks: ['Pytest', 'unittest'], mocks: ['pytest-mock', 'unittest.mock'] },
+    TypeScript: { frameworks: ['Jest', 'Vitest', 'Mocha'], mocks: ['Jest Mock', 'Sinon'] },
+    JavaScript: { frameworks: ['Jest', 'Mocha'], mocks: ['Sinon', 'Jest Mock'] },
+    'C#': { frameworks: ['xUnit', 'NUnit', 'MSTest'], mocks: ['Moq', 'NSubstitute'] },
+    Go: { frameworks: ['testing', 'Ginkgo'], mocks: ['testify', 'gomock'] }
+  };
+
+  const handleLangSelect = (lang: string) => {
+    setTempLang(lang);
+    const opts = STACK_OPTIONS[lang] || { frameworks: ['Unit Test'], mocks: ['Mock Library'] };
+    setTempFramework(opts.frameworks[0] || 'Unit Test');
+    setTempMock(opts.mocks[0] || 'Mock Library');
+  };
+
+  const handleSaveStack = async () => {
+    try {
+      const updated = { language: tempLang, framework: tempFramework, mockLibrary: tempMock };
+      await api.put(`/sessions/${id}/tech-profile`, updated);
+      setTechProfile(updated);
+      setShowEditStack(false);
+    } catch (err) {
+      console.error("Failed to update stack:", err);
+    }
+  };
+
   React.useEffect(() => {
     const fetchSessionData = async () => {
       if (!id) return;
@@ -100,6 +132,10 @@ export const UploadArtifactsView: React.FC = () => {
         const response = await api.get(`/sessions/${id}`);
         const { tech_profile, artifacts } = response.data;
         if (tech_profile) {
+          setTechProfile(tech_profile);
+          setTempLang(tech_profile.language || 'Java');
+          setTempFramework(tech_profile.framework || 'JUnit 5');
+          setTempMock(tech_profile.mockLibrary || 'Mockito');
           if (tech_profile.git_url) setGitUrl(tech_profile.git_url);
           if (tech_profile.git_branch) setGitBranch(tech_profile.git_branch);
           if (tech_profile.git_path) setGitPath(tech_profile.git_path);
@@ -178,11 +214,90 @@ export const UploadArtifactsView: React.FC = () => {
   return (
     <Card className="p-8 mt-10 max-w-4xl mx-auto space-y-8 border-light-border shadow-sm">
       <CardHeader className="p-0">
-        <CardTitle className="font-main-heading text-2xl mb-2">Upload Requirement & Specification Artifacts</CardTitle>
-        <CardDescription className="text-sm text-secondary-text">
-          Provide your sprint/story artifacts along with your Git repository to let the AI formulate business rules and generate target unit tests.
-        </CardDescription>
+        <div className="flex justify-between items-start flex-wrap gap-2">
+          <div>
+            <CardTitle className="font-main-heading text-2xl mb-2">Upload Requirement & Specification Artifacts</CardTitle>
+            <CardDescription className="text-sm text-secondary-text">
+              Provide your sprint/story artifacts along with your Git repository to let the AI formulate business rules and generate target unit tests.
+            </CardDescription>
+          </div>
+          
+          {/* Target Stack Indicator Pill */}
+          <div className="flex items-center gap-2 bg-input-bg border border-light-border px-3 py-1.5 rounded-lg text-xs font-medium text-primary-text shadow-2xs">
+            <Cpu className="w-4 h-4 text-primary-orange" />
+            <span>Target: <strong>{techProfile?.language || 'Java'}</strong> ({techProfile?.framework || 'JUnit 5'})</span>
+            <button
+              type="button"
+              onClick={() => setShowEditStack(!showEditStack)}
+              className="text-primary-orange font-bold hover:underline ml-1"
+            >
+              [Change Stack]
+            </button>
+          </div>
+        </div>
       </CardHeader>
+
+      {/* Inline Stack Switcher Dialog */}
+      {showEditStack && (
+        <div className="p-4 bg-secondary/80 border-2 border-primary-orange rounded-lg shadow-sm space-y-3 animate-in fade-in">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold text-card-foreground flex items-center gap-1.5">
+              <Settings2 className="w-4 h-4 text-primary-orange" />
+              Adjust Target Language & Framework Settings
+            </h4>
+            <button onClick={() => setShowEditStack(false)} className="text-secondary-text hover:text-card-foreground">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-[11px] font-semibold text-secondary-text mb-1">Target Language</label>
+              <select
+                value={tempLang}
+                onChange={(e) => handleLangSelect(e.target.value)}
+                className="w-full bg-card border border-light-border rounded p-1.5 text-xs text-card-foreground"
+              >
+                {Object.keys(STACK_OPTIONS).map(lang => (
+                  <option key={lang} value={lang}>{lang}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-secondary-text mb-1">Testing Framework</label>
+              <select
+                value={tempFramework}
+                onChange={(e) => setTempFramework(e.target.value)}
+                className="w-full bg-card border border-light-border rounded p-1.5 text-xs text-card-foreground"
+              >
+                {(STACK_OPTIONS[tempLang]?.frameworks || ['Unit Test']).map(fw => (
+                  <option key={fw} value={fw}>{fw}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[11px] font-semibold text-secondary-text mb-1">Mocking Library</label>
+              <select
+                value={tempMock}
+                onChange={(e) => setTempMock(e.target.value)}
+                className="w-full bg-card border border-light-border rounded p-1.5 text-xs text-card-foreground"
+              >
+                {(STACK_OPTIONS[tempLang]?.mocks || ['Mock Library']).map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-1">
+            <Button size="sm" variant="secondary" onClick={() => setShowEditStack(false)} className="text-xs">
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleSaveStack} className="text-xs flex items-center gap-1">
+              <Check className="w-3.5 h-3.5" />
+              Save Stack Profile
+            </Button>
+          </div>
+        </div>
+      )}
 
       {errorMsg && (
         <div className="p-4 border border-orange-border bg-input-bg text-primary-orange text-sm rounded-md shadow-sm break-all">
