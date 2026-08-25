@@ -7,10 +7,6 @@ import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '../components/ui/Card';
-<<<<<<< HEAD
-
-=======
->>>>>>> 8981c005276d770f5601c359b938c8c00d63c14a
 interface JiraTicket {
   id: string;
   title: string;
