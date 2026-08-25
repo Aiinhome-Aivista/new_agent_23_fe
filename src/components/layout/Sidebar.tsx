@@ -77,7 +77,7 @@ export const Sidebar: React.FC = () => {
         {isAuthenticated && (
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full opacity-90 hover:opacity-100 hover:text-red-400 transition-colors text-placeholder pt-2 mt-2 border-t border-light-border/20"
+            className="flex items-center gap-3 w-full opacity-90 hover:opacity-100 hover:text-red-400 transition-colors text-placeholder px-4 py-2 rounded-[10px] border border-light-border"
           >
             <LogOut className="w-5 h-5" />
             <span className="font-dropdown-label text-sm">Sign Out</span>
