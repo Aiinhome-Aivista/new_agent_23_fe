@@ -26,7 +26,7 @@ export const AgentExecutionView: React.FC = () => {
           {isStreaming && <span className="ml-2 w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>}
         </div>
         <Button size="sm" onClick={handleProceed} className="text-xs">
-          Skip to Workspace
+          Go to Workspace
         </Button>
       </div>
       <div className="flex-1 overflow-y-auto p-4 font-mono text-sm text-foreground whitespace-pre-wrap">
