@@ -54,6 +54,7 @@ export const DecompositionReviewView: React.FC = () => {
   const [hasUserDismissedModal, setHasUserDismissedModal] = useState(false);
 
   // Language Mismatch Pop-up State
+  const [gitError, setGitError] = useState<string | null>(null);
   const [languageMismatch, setLanguageMismatch] = useState<LanguageMismatchData | null>(null);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [hasUserDismissedLangModal, setHasUserDismissedLangModal] = useState(false);
@@ -231,6 +232,12 @@ export const DecompositionReviewView: React.FC = () => {
         
         if (decompRes.data?.tech_profile) {
           setCurrentTechProfile(decompRes.data.tech_profile);
+          if (decompRes.data.tech_profile.git_error) {
+            setGitError(decompRes.data.tech_profile.git_error);
+            setLoading(false);
+            clearInterval(intervalId);
+            return;
+          }
         }
 
         // Language Mismatch Detection & Pop-up Trigger
@@ -315,6 +322,29 @@ export const DecompositionReviewView: React.FC = () => {
           Please wait while the LLM parses the requirements, clones the git repository, crawls the source code files, and extracts the target business rules.
         </p>
         <span className="text-xs text-placeholder mt-4 font-mono">Elapsed time: {timeElapsed}s</span>
+      </Card>
+    );
+  }
+
+  // Git Error State
+  if (gitError) {
+    return (
+      <Card className="flex flex-col items-center justify-center min-h-[400px] mt-20 p-10 max-w-2xl mx-auto shadow-md border-2 border-red-500/50 bg-red-500/5">
+        <div className="p-3 bg-red-100 dark:bg-red-950/70 border border-red-300 rounded-full text-red-600 mb-4">
+          <AlertTriangle className="w-8 h-8 text-red-600 animate-pulse" />
+        </div>
+        <h3 className="font-main-heading text-xl font-bold text-red-600 dark:text-red-400 mb-2">
+          Git Repository Error Detected
+        </h3>
+        <p className="text-xs text-primary-text text-center max-w-md bg-card p-3 rounded border border-red-200 font-mono my-2 leading-relaxed">
+          {gitError}
+        </p>
+        <p className="text-xs text-secondary-text text-center max-w-md mt-1">
+          Please check that your Git repository URL is correct, the branch name (e.g. main/master) exists, and authentication tokens (if private) are valid.
+        </p>
+        <Button onClick={() => navigate(`/session/${id}/upload`)} className="mt-6 bg-primary-orange hover:bg-hover-orange">
+          <ArrowLeft className="w-4 h-4 mr-1" /> Go Back to Upload & Fix Git Settings
+        </Button>
       </Card>
     );
   }
