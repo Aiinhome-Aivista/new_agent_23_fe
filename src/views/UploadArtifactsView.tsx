@@ -305,7 +305,7 @@ export const UploadArtifactsView: React.FC = () => {
 
       {/* Inline Stack Switcher Dialog */}
       {showEditStack && (
-        <div className="p-4 bg-secondary/80 border-2 border-primary-orange rounded-lg shadow-sm space-y-3 animate-in fade-in">
+        <div className="p-4 bg-orange-500/5 dark:bg-orange-950/20 border-2 border-primary-orange/60 rounded-lg shadow-sm space-y-3 animate-in fade-in">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-bold text-card-foreground flex items-center gap-1.5">
               <Settings2 className="w-4 h-4 text-primary-orange" />
