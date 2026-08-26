@@ -60,19 +60,22 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
   mismatchData,
 }) => {
   const [isSwitching, setIsSwitching] = useState(false);
-  const [showCustomForm, setShowCustomForm] = useState(false);
 
   const detectedLang = mismatchData.detected_language || 'Python';
   const selectedLang = mismatchData.selected_language || 'Java';
   const recFramework = mismatchData.recommended_framework || LANGUAGE_FRAMEWORKS[detectedLang]?.frameworks[0] || 'Pytest';
   const recMock = mismatchData.recommended_mock_library || LANGUAGE_FRAMEWORKS[detectedLang]?.mocks[0] || 'pytest-mock';
 
-  // Custom Form State
-  const [customLang, setCustomLang] = useState(detectedLang);
-  const [customFramework, setCustomFramework] = useState(recFramework);
-  const [customMock, setCustomMock] = useState(recMock);
+  const isActualMismatch = selectedLang.toLowerCase() !== detectedLang.toLowerCase();
 
-  if (!isOpen || !mismatchData.is_mismatch) return null;
+  const [showCustomForm, setShowCustomForm] = useState(!isActualMismatch);
+
+  // Custom Form State
+  const [customLang, setCustomLang] = useState(selectedLang);
+  const [customFramework, setCustomFramework] = useState(mismatchData.selected_framework || recFramework);
+  const [customMock, setCustomMock] = useState(mismatchData.selected_mock_library || recMock);
+
+  if (!isOpen) return null;
 
   const handleLanguageChange = (lang: string) => {
     setCustomLang(lang);
@@ -116,19 +119,32 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
         <div className="bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-transparent p-5 border-b border-light-border flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-orange-100 dark:bg-orange-950/60 border border-orange-400 rounded-lg text-primary-orange shadow-xs">
-              <AlertTriangle className="w-6 h-6 text-primary-orange animate-bounce" />
+              {isActualMismatch ? (
+                <AlertTriangle className="w-6 h-6 text-primary-orange animate-bounce" />
+              ) : (
+                <Settings className="w-6 h-6 text-primary-orange" />
+              )}
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold text-card-foreground">
-                  Language & Technology Mismatch Detected
+                  {isActualMismatch ? "Language & Technology Mismatch Detected" : "Technology Stack Settings"}
                 </h2>
-                <Badge variant="warning" className="text-[11px] font-mono px-2 py-0.5 font-bold uppercase">
-                  Stack Conflict
-                </Badge>
+                {!isActualMismatch && (
+                  <Badge variant="outline" className="text-[11px] font-mono px-2 py-0.5 font-bold uppercase border-primary-orange/40 text-primary-orange">
+                    Active Stack
+                  </Badge>
+                )}
+                {isActualMismatch && (
+                  <Badge variant="warning" className="text-[11px] font-mono px-2 py-0.5 font-bold uppercase">
+                    Stack Conflict
+                  </Badge>
+                )}
               </div>
               <p className="text-xs text-secondary-text mt-0.5">
-                The session target language does not match the source code found in your connected repository.
+                {isActualMismatch 
+                  ? "The session target language does not match the source code found in your connected repository."
+                  : "Review and configure the target language, test framework, and mocking library for your project."}
               </p>
             </div>
           </div>
@@ -146,12 +162,22 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
           {/* Comparison Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Selected Profile */}
-            <div className="p-4 rounded-lg bg-red-50/50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 space-y-2">
+            <div className={`p-4 rounded-lg border space-y-2 ${
+              isActualMismatch 
+                ? "bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50" 
+                : "bg-muted/55 dark:bg-muted/10 border-light-border"
+            }`}>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wide flex items-center gap-1.5">
+                <span className={`text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 ${
+                  isActualMismatch ? "text-red-600 dark:text-red-400" : "text-secondary-text"
+                }`}>
                   <Cpu className="w-3.5 h-3.5" /> Selected in Session
                 </span>
-                <span className="text-[10px] bg-red-100 text-red-800 border border-red-300 px-2 py-0.5 rounded-full font-semibold">
+                <span className={`text-[10px] border px-2 py-0.5 rounded-full font-semibold ${
+                  isActualMismatch 
+                    ? "bg-red-100 text-red-800 border-red-300" 
+                    : "bg-orange-500/10 text-primary-orange border-primary-orange/30"
+                }`}>
                   Configured
                 </span>
               </div>
@@ -163,12 +189,22 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
             </div>
 
             {/* Detected in Codebase */}
-            <div className="p-4 rounded-lg bg-green-50/60 dark:bg-green-950/20 border border-green-300 dark:border-green-800/60 space-y-2">
+            <div className={`p-4 rounded-lg border space-y-2 ${
+              isActualMismatch 
+                ? "bg-green-50/60 dark:bg-green-950/20 border-green-300 dark:border-green-800/60" 
+                : "bg-muted/55 dark:bg-muted/10 border-light-border"
+            }`}>
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-green-700 dark:text-green-400 uppercase tracking-wide flex items-center gap-1.5">
+                <span className={`text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 ${
+                  isActualMismatch ? "text-green-700 dark:text-green-400" : "text-secondary-text"
+                }`}>
                   <Code2 className="w-3.5 h-3.5" /> Detected in Repository
                 </span>
-                <span className="text-[10px] bg-green-100 text-green-800 border border-green-300 px-2 py-0.5 rounded-full font-semibold">
+                <span className={`text-[10px] border px-2 py-0.5 rounded-full font-semibold ${
+                  isActualMismatch 
+                    ? "bg-green-100 text-green-800 border-green-300" 
+                    : "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30"
+                }`}>
                   Actual Code
                 </span>
               </div>
@@ -188,50 +224,56 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
           </div>
 
           {/* Conflict Explanation */}
-          <div className="bg-input-bg border border-orange-200 rounded-lg p-3.5 text-xs text-primary-text space-y-1">
-            <p className="font-semibold text-primary-orange">
-              Why this matters:
-            </p>
-            <p className="text-secondary-text leading-relaxed">
-              You selected <strong>{selectedLang}</strong>, but your repository contains <strong>{detectedLang}</strong> code. Generating {selectedLang} test suites (e.g. JUnit/Mockito) for {detectedLang} source code will result in uncompilable test suites and execution failures.
-            </p>
-          </div>
-
-          {/* Quick Auto-Fix Banner */}
-          <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-primary-orange/60 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-            <div>
-              <div className="font-bold text-sm text-card-foreground flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-primary-orange" />
-                Recommended Quick Fix:
-              </div>
-              <p className="text-xs text-secondary-text mt-0.5">
-                Auto-switch Target Language to <strong>{detectedLang}</strong> ({recFramework} + {recMock}) and continue test generation.
+          {isActualMismatch && (
+            <div className="bg-input-bg border border-orange-200 rounded-lg p-3.5 text-xs text-primary-text space-y-1">
+              <p className="font-semibold text-primary-orange">
+                Why this matters:
+              </p>
+              <p className="text-secondary-text leading-relaxed">
+                You selected <strong>{selectedLang}</strong>, but your repository contains <strong>{detectedLang}</strong> code. Generating {selectedLang} test suites (e.g. JUnit/Mockito) for {detectedLang} source code will result in uncompilable test suites and execution failures.
               </p>
             </div>
-            <Button
-              onClick={handleQuickSwitch}
-              disabled={isSwitching}
-              className="whitespace-nowrap flex items-center gap-2 text-xs shadow-md bg-primary-orange hover:bg-hover-orange"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSwitching ? 'animate-spin' : ''}`} />
-              Auto-Switch to {detectedLang}
-            </Button>
-          </div>
+          )}
+
+          {/* Quick Auto-Fix Banner */}
+          {isActualMismatch && (
+            <div className="p-4 rounded-lg bg-gradient-to-r from-orange-500/10 to-amber-500/10 border border-primary-orange/60 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+              <div>
+                <div className="font-bold text-sm text-card-foreground flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-primary-orange" />
+                  Recommended Quick Fix:
+                </div>
+                <p className="text-xs text-secondary-text mt-0.5">
+                  Auto-switch Target Language to <strong>{detectedLang}</strong> ({recFramework} + {recMock}) and continue test generation.
+                </p>
+              </div>
+              <Button
+                onClick={handleQuickSwitch}
+                disabled={isSwitching}
+                className="whitespace-nowrap flex items-center gap-2 text-xs shadow-md bg-primary-orange hover:bg-hover-orange"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isSwitching ? 'animate-spin' : ''}`} />
+                Auto-Switch to {detectedLang}
+              </Button>
+            </div>
+          )}
 
           {/* Toggle Manual Customization Form */}
           <div>
-            <button
-              type="button"
-              onClick={() => setShowCustomForm(!showCustomForm)}
-              className="text-xs font-semibold text-primary-orange hover:underline flex items-center gap-1"
-            >
-              <Settings className="w-3.5 h-3.5" />
-              {showCustomForm ? 'Hide Manual Language Settings' : 'Or Choose Target Language & Framework Manually'}
-            </button>
+            {isActualMismatch && (
+              <button
+                type="button"
+                onClick={() => setShowCustomForm(!showCustomForm)}
+                className="text-xs font-semibold text-primary-orange hover:underline flex items-center gap-1 mb-3"
+              >
+                <Settings className="w-3.5 h-3.5" />
+                {showCustomForm ? 'Hide Manual Language Settings' : 'Or Choose Target Language & Framework Manually'}
+              </button>
+            )}
 
-            {showCustomForm && (
-              <div className="mt-3 p-4 bg-muted border border-light-border rounded-lg space-y-3 animate-in fade-in">
-                <h4 className="text-xs font-bold text-primary-text">Manually Select Technology Stack</h4>
+            {(showCustomForm || !isActualMismatch) && (
+              <div className="p-4 bg-muted border border-light-border rounded-lg space-y-3 animate-in fade-in">
+                <h4 className="text-xs font-bold text-primary-text">Configure Technology Stack</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[11px] font-semibold text-secondary-text mb-1">Target Language</label>
@@ -301,7 +343,7 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
             onClick={onClose}
             className="text-xs text-secondary-text hover:text-primary-text underline transition-colors px-2"
           >
-            Continue as {selectedLang} Anyway
+            {isActualMismatch ? `Continue as ${selectedLang} Anyway` : 'Cancel & Close'}
           </button>
         </div>
       </div>

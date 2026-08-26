@@ -389,12 +389,14 @@ export const DecompositionReviewView: React.FC = () => {
               <span>Target: <strong>{activeLang}</strong> ({activeFramework})</span>
               <button
                 onClick={() => {
+                  const detLang = languageMismatch?.detected_language || activeLang;
+                  const isDiff = activeLang.trim().toLowerCase() !== detLang.trim().toLowerCase();
                   setLanguageMismatch({
-                    is_mismatch: true,
+                    is_mismatch: isDiff,
                     selected_language: activeLang,
                     selected_framework: activeFramework,
                     selected_mock_library: currentTechProfile?.mockLibrary || 'Mock',
-                    detected_language: languageMismatch?.detected_language || activeLang,
+                    detected_language: detLang,
                     recommended_framework: languageMismatch?.recommended_framework || activeFramework,
                     recommended_mock_library: languageMismatch?.recommended_mock_library || 'Mock'
                   });
@@ -426,7 +428,12 @@ export const DecompositionReviewView: React.FC = () => {
       </div>
 
       {/* Language Mismatch Alert Banner */}
-      {languageMismatch?.is_mismatch && (
+      {Boolean(
+        languageMismatch?.is_mismatch &&
+        languageMismatch?.selected_language &&
+        languageMismatch?.detected_language &&
+        languageMismatch.selected_language.trim().toLowerCase() !== languageMismatch.detected_language.trim().toLowerCase()
+      ) && languageMismatch && (
         <div className="p-3.5 bg-red-500/10 border-2 border-red-400 dark:border-red-800 rounded-lg flex items-center justify-between shadow-2xs animate-in fade-in">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-100 dark:bg-red-950/70 border border-red-300 rounded-md text-red-600">
@@ -507,7 +514,7 @@ export const DecompositionReviewView: React.FC = () => {
           </h3>
           
           {isAddingRule && (
-            <div className="p-4 bg-secondary border-2 border-primary-orange rounded-md mb-4 shadow-md space-y-3 animate-in fade-in">
+            <div className="p-4 bg-orange-500/5 dark:bg-orange-950/20 border-2 border-primary-orange/60 rounded-lg mb-4 shadow-md space-y-3 animate-in fade-in">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-bold text-primary-text flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-primary-orange" />
@@ -623,13 +630,15 @@ export const DecompositionReviewView: React.FC = () => {
               <div className="flex items-center justify-between pt-1">
                 <Button 
                   size="sm" 
-                  variant="secondary"
+                  variant="outline"
                   onClick={handleValidateRule}
                   disabled={isValidating || isSavingRule || !newRule.rule_code || !newRule.rule_text}
-                  className="text-xs flex items-center gap-1.5 border-primary-orange/50 text-primary-orange hover:bg-orange-50 dark:hover:bg-orange-950/30"
+                  className="text-xs font-bold flex items-center gap-1.5 border-2 border-primary-orange text-primary-orange bg-card hover:bg-orange-500/10 dark:hover:bg-orange-950/40 disabled:opacity-50 disabled:border-primary-orange/40 shadow-xs"
                 >
-                  <Sparkles className={`w-3.5 h-3.5 ${isValidating ? 'animate-spin' : ''}`} />
-                  {isValidating ? 'Checking Story Match...' : 'Validate with LLM'}
+                  <Sparkles className={`w-3.5 h-3.5 text-primary-orange ${isValidating ? 'animate-spin' : ''}`} />
+                  <span className="text-primary-orange font-bold">
+                    {isValidating ? 'Checking Story Match...' : 'Validate with LLM'}
+                  </span>
                 </Button>
 
                 <div className="flex gap-2">
