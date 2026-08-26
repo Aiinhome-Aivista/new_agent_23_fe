@@ -379,7 +379,7 @@ export const DecompositionReviewView: React.FC = () => {
   const activeFramework = currentTechProfile?.framework || 'JUnit 5';
 
   return (
-    <div className="flex flex-col h-[85vh] space-y-4">
+    <div className="flex flex-col h-[80vh] space-y-4">
       {/* Language Mismatch Alert Pop-up Modal */}
       {languageMismatch && (
         <LanguageMismatchModal
@@ -444,7 +444,7 @@ export const DecompositionReviewView: React.FC = () => {
 
         <div className="flex items-center gap-3">
           <Button
-            variant="secondary"
+            variant="default"
             onClick={() => navigate(`/session/${id}/upload`)}
             className="text-xs shadow-xs"
             leftIcon={<ArrowLeft className="w-4 h-4" />}
@@ -521,7 +521,7 @@ export const DecompositionReviewView: React.FC = () => {
           </div>
           <Button
             size="sm"
-            variant="secondary"
+            variant="default"
             onClick={() => setShowMissingModal(true)}
             className="text-xs"
           >
@@ -536,7 +536,7 @@ export const DecompositionReviewView: React.FC = () => {
           <h3 className="font-dropdown-label border-b border-light-border pb-3 mb-4 text-primary-orange flex justify-between items-center">
             <span>Extracted Business Rules & Acceptance Criteria</span>
             <div className="flex gap-2 items-center">
-              <Button size="sm" variant="secondary" onClick={() => isAddingRule ? setIsAddingRule(false) : handleOpenAddRule()} className="text-xs " leftIcon={<PlusCircle className="w-3 h-3" />}>
+              <Button size="sm" variant="default" onClick={() => isAddingRule ? setIsAddingRule(false) : handleOpenAddRule()} className="text-sm " leftIcon={<PlusCircle className="w-4 h-4" />}>
                 Add Rule
               </Button>
               <Badge variant="warning" className="text-xs px-2 py-0.5 font-mono">{rules.length} Rules</Badge>

@@ -72,7 +72,7 @@ export const UploadArtifactsView: React.FC = () => {
     if (correctedUrl.endsWith('.atlassian.com')) {
       correctedUrl = correctedUrl.replace('.atlassian.com', '.atlassian.net');
     }
-    
+
     // Update state if we corrected it so the user sees the fix
     if (correctedUrl !== jiraUrl) {
       setJiraUrl(correctedUrl);
@@ -83,7 +83,7 @@ export const UploadArtifactsView: React.FC = () => {
       setJiraStatus('error');
       return;
     }
-    
+
     setLoadingTickets(true);
     setJiraStatus('idle');
     setErrorMsg(null);
@@ -108,7 +108,7 @@ export const UploadArtifactsView: React.FC = () => {
   const handleDisconnect = () => {
     // Remove files created from Jira tickets
     setFiles(prev => prev.filter(f => !jiraTickets.some(t => f.name === `${t.id}.json`)));
-    
+
     // Reset credentials and states
     setJiraUrl('');
     setJiraEmail('');
@@ -188,7 +188,7 @@ export const UploadArtifactsView: React.FC = () => {
     if (existingArtifacts.some(a => a.filename === `${ticket.id}.json`)) return;
 
     const isFileSelected = files.some(f => f.name === `${ticket.id}.json`);
-    
+
     if (isFileSelected) {
       setFiles(prev => prev.filter(f => f.name !== `${ticket.id}.json`));
     } else {
@@ -226,7 +226,7 @@ export const UploadArtifactsView: React.FC = () => {
         });
         setUploadedCount(i + 1);
       }
-      
+
       const finalGitUrl = validatedGitUrl || gitUrl.trim();
 
       // Trigger background decomposition & agent graph with Git metadata
@@ -235,7 +235,7 @@ export const UploadArtifactsView: React.FC = () => {
         git_branch: gitBranch.trim() || null,
         git_path: gitPath.trim() || null
       });
-      
+
       setCurrentStep(3);
       navigate(`/session/${id}/decomposition`);
     } catch (error: any) {
@@ -278,7 +278,7 @@ export const UploadArtifactsView: React.FC = () => {
   };
 
   return (
-    <Card className="p-8 mt-10 max-w-4xl mx-auto space-y-8 border-light-border shadow-sm">
+    <Card className="p-8 mt-10 max-w-5xl mx-auto space-y-8 border-light-border shadow-sm">
       <CardHeader className="p-0">
         <div className="flex justify-between items-start flex-wrap gap-2">
           <div>
@@ -287,7 +287,7 @@ export const UploadArtifactsView: React.FC = () => {
               Provide your sprint/story artifacts along with your Git repository to let the AI formulate business rules and generate target unit tests.
             </CardDescription>
           </div>
-          
+
           {/* Target Stack Indicator Pill */}
           <div className="flex items-center gap-2 bg-input-bg/60 border border-light-border px-3 py-1.5 rounded-lg text-xs font-medium text-primary-text shadow-2xs">
             <Cpu className="w-4 h-4 text-primary-orange" />
@@ -357,8 +357,7 @@ export const UploadArtifactsView: React.FC = () => {
             <Button size="sm" variant="secondary" onClick={() => setShowEditStack(false)} className="text-xs">
               Cancel
             </Button>
-            <Button size="sm" onClick={handleSaveStack} className="text-xs flex items-center gap-1">
-              <Check className="w-3.5 h-3.5" />
+            <Button size="sm" onClick={handleSaveStack} className="text-xs" leftIcon={<Check className="w-3.5 h-3.5" />}>
               Save Stack Profile
             </Button>
           </div>
@@ -370,59 +369,86 @@ export const UploadArtifactsView: React.FC = () => {
           {errorMsg}
         </div>
       )}
-      
-      {/* Sprint/Story Upload Section */}
-      <div 
-        {...getRootProps()} 
-        className={`border-2 border-dashed rounded-lg p-10 text-center cursor-pointer transition-colors
-          ${isDragActive ? 'border-orange-border bg-input-bg' : 'border-light-border hover:border-orange-border'}`}
-      >
-        <input {...getInputProps()} />
-        <UploadCloud className="w-12 h-12 mx-auto text-primary-orange mb-4" />
-        <p className="font-instruction-text font-semibold">
-          {isDragActive ? "Drop files here..." : "Drag & drop sprint / story files here, or click to browse"}
-        </p>
-        <p className="text-xs text-placeholder mt-2">
-          Supports BRD (.md, .txt, .docx), API Specifications (.json, .yaml), and Database Schemas (.sql)
-        </p>
+
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
+        {/* Sprint/Story Upload Section */}
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors h-full flex flex-col justify-center lg:col-span-2
+            ${isDragActive ? 'border-orange-border bg-input-bg' : 'border-light-border hover:border-orange-border'}`}
+        >
+          <input {...getInputProps()} />
+          <UploadCloud className="w-12 h-12 mx-auto text-primary-orange mb-4" />
+          <p className="font-instruction-text font-semibold">
+            {isDragActive ? "Drop files here..." : "Drag & drop sprint / story files here, or click to browse"}
+          </p>
+          <p className="text-xs text-placeholder mt-2">
+            Supports BRD (.md, .txt, .docx), API Specifications (.json, .yaml), and Database Schemas (.sql)
+          </p>
+        </div>
+
+
+        {/* Git Connection Section */}
+        <div className="border border-light-border rounded-lg p-6 bg-card shadow-sm h-full flex flex-col lg:col-span-3">
+          <h3 className="font-dropdown-label text-md font-semibold text-primary-text mb-4 flex items-center gap-2">
+            <GitBranch className="w-5 h-5 text-primary-orange" />
+            Connect Git Repository (Optional)
+          </h3>
+
+          <div className="space-y-4 flex-1">
+            <div>
+              <label className="block text-xs font-semibold text-secondary-text mb-1">Git Repository URL</label>
+              <input
+                type="text"
+                placeholder="e.g. https://github.com/username/project-repository.git"
+                value={gitUrl}
+                onChange={(e) => setGitUrl(e.target.value)}
+                className="w-full input-custom text-sm"
+              />
+              <p className="text-xs text-placeholder mt-1">
+                For private repos, use format: <code className="bg-muted px-1 py-0.5 rounded font-mono text-[11px]">https://&lt;token&gt;@github.com/user/repo.git</code>
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              className="flex items-center gap-1.5 text-xs font-medium text-primary-orange hover:text-hover-orange transition-colors"
+            >
+              <Settings2 className="w-3.5 h-3.5" />
+              {showAdvanced ? "Hide Advanced Settings" : "Show Advanced Settings"}
+            </button>
+
+            {showAdvanced && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-dashed border-light-border">
+                <div>
+                  <label className="block text-xs font-semibold text-secondary-text mb-1">Target Branch</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. main or master"
+                    value={gitBranch}
+                    onChange={(e) => setGitBranch(e.target.value)}
+                    className="w-full input-custom text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-secondary-text mb-1 flex items-center gap-1">
+                    <FolderOpen className="w-3.5 h-3.5" /> Subdirectory Path (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. src/main/java"
+                    value={gitPath}
+                    onChange={(e) => setGitPath(e.target.value)}
+                    className="w-full input-custom text-sm"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {files.length > 0 && (
-        <div>
-          <h3 className="font-dropdown-label mb-3 font-semibold text-primary-text">Queued Requirement Artifacts ({files.length})</h3>
-          <ul className="space-y-2">
-            {files.map((file, i) => (
-              <li key={i} className="flex justify-between items-center p-3 border border-light-border rounded bg-input-bg">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary-orange" />
-                  <span className="font-chat-input text-sm font-medium text-primary-text">{file.name}</span>
-                </div>
-                <span className="text-placeholder text-xs font-mono">{(file.size / 1024).toFixed(1)} KB</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {existingArtifacts.length > 0 && (
-        <div className="mt-4">
-          <h3 className="font-dropdown-label mb-3 font-semibold text-primary-text flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-primary-orange" />
-            Previously Uploaded Artifacts ({existingArtifacts.length})
-          </h3>
-          <ul className="space-y-2">
-            {existingArtifacts.map((art, i) => (
-              <li key={i} className="flex justify-between items-center p-3 border border-light-border rounded bg-card shadow-2xs">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-primary-orange" />
-                  <span className="font-chat-input text-sm font-medium text-primary-text">{art.filename}</span>
-                </div>
-                <span className="text-placeholder text-xs font-mono capitalize px-2 py-0.5 border border-light-border rounded-full bg-input-bg">{art.file_type.toLowerCase().replace('_', ' ')}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       {/* Jira Tickets Section */}
       <div className="border border-light-border rounded-lg p-6 bg-card shadow-sm">
@@ -432,7 +458,7 @@ export const UploadArtifactsView: React.FC = () => {
           {jiraStatus === 'success' && <span className="ml-2 flex items-center gap-1 text-[11px] font-bold text-green-700 bg-green-100 border border-green-300 px-2 py-0.5 rounded-full"><CheckCircle2 className="w-3 h-3" /> Connected</span>}
           {jiraStatus === 'error' && <span className="ml-2 flex items-center gap-1 text-[11px] font-bold text-primary-orange bg-input-bg border border-orange-border px-2 py-0.5 rounded-full">Connection Failed</span>}
         </h3>
-        
+
         {jiraStatus === 'success' ? (
           <div className="bg-card border border-light-border border-l-4 border-l-green-500 rounded-lg p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in shadow-xs mb-6">
             <div className="flex items-start gap-4">
@@ -451,34 +477,35 @@ export const UploadArtifactsView: React.FC = () => {
                     <span className="text-placeholder font-sans w-32 shrink-0 flex items-center gap-1.5">
                       <Globe className="w-3.5 h-3.5 text-placeholder" />
                       Instance URL:
-                    </span> 
+                    </span>
                     <span className="text-primary-text font-semibold break-all bg-muted/60 dark:bg-muted/30 px-2.5 py-1 rounded-md border border-light-border shadow-3xs">{jiraUrl.replace(/^https?:\/\//, '').split('/')[0]}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-placeholder font-sans w-32 shrink-0 flex items-center gap-1.5">
                       <FolderOpen className="w-3.5 h-3.5 text-placeholder" />
                       Project Key:
-                    </span> 
+                    </span>
                     <span className="text-primary-text font-semibold break-all bg-muted/60 dark:bg-muted/30 px-2.5 py-1 rounded-md border border-light-border shadow-3xs">{jiraProject}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-placeholder font-sans w-32 shrink-0 flex items-center gap-1.5">
                       <Mail className="w-3.5 h-3.5 text-placeholder" />
                       Connected User:
-                    </span> 
+                    </span>
                     <span className="text-primary-text font-semibold break-all bg-muted/60 dark:bg-muted/30 px-2.5 py-1 rounded-md border border-light-border shadow-3xs">{jiraEmail}</span>
                   </div>
                 </div>
               </div>
             </div>
             <div className="flex sm:flex-row md:flex-row items-center gap-2.5 self-end md:self-center w-full md:w-auto justify-end">
-              <Button 
-                type="button" 
+              <Button
+                type="button"
+                variant='default'
                 onClick={fetchTickets}
                 disabled={loadingTickets}
-                className="text-xs px-4 py-2 flex items-center gap-1.5 shadow-sm hover:opacity-95"
+                className="text-xs px-4 py-2 shadow-sm hover:opacity-95"
+                leftIcon={<Cpu className={`w-3.5 h-3.5 ${loadingTickets ? 'animate-spin' : ''}`} />}
               >
-                <Cpu className="w-3.5 h-3.5 animate-spin" style={{ display: loadingTickets ? 'inline' : 'none' }} />
                 {loadingTickets ? 'Syncing...' : 'Sync Tickets'}
               </Button>
               <Button
@@ -541,8 +568,8 @@ export const UploadArtifactsView: React.FC = () => {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 onClick={fetchTickets}
                 disabled={loadingTickets}
               >
@@ -569,7 +596,7 @@ export const UploadArtifactsView: React.FC = () => {
                     <p className="text-xs text-secondary-text mt-1 line-clamp-2">{ticket.description}</p>
                   </div>
                   <Button
-                    variant="outline"
+                    variant={isSelected ? "success" : "default"}
                     size="sm"
                     onClick={() => handleSelectTicket(ticket)}
                     disabled={existingArtifacts.some(a => a.filename === `${ticket.id}.json`)}
@@ -587,74 +614,55 @@ export const UploadArtifactsView: React.FC = () => {
         ) : null}
       </div>
 
-      {/* Git Connection Section */}
-      <div className="border border-light-border rounded-lg p-6 bg-card shadow-sm">
-        <h3 className="font-dropdown-label text-md font-semibold text-primary-text mb-4 flex items-center gap-2">
-          <GitBranch className="w-5 h-5 text-primary-orange" />
-          Connect Git Repository (Optional)
-        </h3>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-secondary-text mb-1">Git Repository URL</label>
-            <input
-              type="text"
-              placeholder="e.g. https://github.com/username/project-repository.git"
-              value={gitUrl}
-              onChange={(e) => setGitUrl(e.target.value)}
-              className="w-full input-custom text-sm"
-            />
-            <p className="text-xs text-placeholder mt-1">
-              For private repos, use format: <code className="bg-muted px-1 py-0.5 rounded font-mono text-[11px]">https://&lt;token&gt;@github.com/user/repo.git</code>
-            </p>
-          </div>
+      {(files.length > 0 || existingArtifacts.length > 0) && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
+          {existingArtifacts.length > 0 && (
+            <div>
+              <h3 className="font-dropdown-label mb-3 font-semibold text-primary-text flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary-orange" />
+                Previously Uploaded Artifacts ({existingArtifacts.length})
+              </h3>
+              <ul className="space-y-2">
+                {existingArtifacts.map((art, i) => (
+                  <li key={i} className="flex justify-between items-center p-3 border border-light-border rounded bg-card shadow-2xs">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-primary-orange" />
+                      <span className="font-chat-input text-sm font-medium text-primary-text">{art.filename}</span>
+                    </div>
+                    <span className="text-placeholder text-xs font-mono capitalize px-2 py-0.5 border border-border rounded-full bg-background">{art.file_type.toLowerCase().replace('_', ' ')}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          <button 
-            type="button"
-            onClick={() => setShowAdvanced(!showAdvanced)} 
-            className="flex items-center gap-1.5 text-xs font-medium text-primary-orange hover:text-hover-orange transition-colors"
-          >
-            <Settings2 className="w-3.5 h-3.5" />
-            {showAdvanced ? "Hide Advanced Settings" : "Show Advanced Settings"}
-          </button>
-
-          {showAdvanced && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-dashed border-light-border">
-              <div>
-                <label className="block text-xs font-semibold text-secondary-text mb-1">Target Branch</label>
-                <input
-                  type="text"
-                  placeholder="e.g. main or master"
-                  value={gitBranch}
-                  onChange={(e) => setGitBranch(e.target.value)}
-                  className="w-full input-custom text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-secondary-text mb-1 flex items-center gap-1">
-                  <FolderOpen className="w-3.5 h-3.5" /> Subdirectory Path (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. src/main/java"
-                  value={gitPath}
-                  onChange={(e) => setGitPath(e.target.value)}
-                  className="w-full input-custom text-sm"
-                />
-              </div>
+          {files.length > 0 && (
+            <div>
+              <h3 className="font-dropdown-label mb-3 font-semibold text-primary-text">Queued Requirement Artifacts ({files.length})</h3>
+              <ul className="space-y-2">
+                {files.map((file, i) => (
+                  <li key={i} className="flex justify-between items-center p-3 border border-light-border rounded bg-input-bg">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-primary-orange" />
+                      <span className="font-chat-input text-sm font-medium text-primary-text">{file.name}</span>
+                    </div>
+                    <span className="text-placeholder text-xs font-mono">{(file.size / 1024).toFixed(1)} KB</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
-      </div>
+      )}
 
       {/* Footer / Submit Section */}
       <CardFooter className="pt-4 px-0 pb-0 flex justify-between items-center border-t border-light-border">
         <span className="text-xs text-secondary-text">
           {uploading ? `Processing file ${uploadedCount} of ${files.length}...` : `${files.length} file(s) ready for decomposition.`}
         </span>
-        <Button 
-          onClick={handleDecompose} 
-          disabled={(files.length === 0 && !gitUrl) || uploading} 
+        <Button
+          onClick={handleDecompose}
+          disabled={(files.length === 0 && !gitUrl) || uploading}
           className="uppercase font-bold"
         >
           {uploading ? 'Parsing & Decomposing...' : 'Start Decomposition Pipeline'}

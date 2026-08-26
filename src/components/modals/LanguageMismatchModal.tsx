@@ -116,13 +116,13 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
         aria-modal="true"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500/15 via-amber-500/10 to-transparent p-5 border-b border-light-border flex items-start justify-between">
+        <div className="bg-card p-5 border-b border-light-border flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-orange-100 dark:bg-orange-950/60 border border-orange-400 rounded-lg text-primary-orange shadow-xs">
               {isActualMismatch ? (
                 <AlertTriangle className="w-6 h-6 text-primary-orange animate-bounce" />
               ) : (
-                <Settings className="w-6 h-6 text-primary-orange" />
+                <Settings className="w-6 h-6 text-primary-orange animate-spin" />
               )}
             </div>
             <div>
@@ -165,7 +165,7 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
             <div className={`p-4 rounded-lg border space-y-2 ${
               isActualMismatch 
                 ? "bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50" 
-                : "bg-muted/55 dark:bg-muted/10 border-light-border"
+                : "bg-muted/55 dark:bg-muted/10 border-border"
             }`}>
               <div className="flex items-center justify-between">
                 <span className={`text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 ${
@@ -192,7 +192,7 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
             <div className={`p-4 rounded-lg border space-y-2 ${
               isActualMismatch 
                 ? "bg-green-50/60 dark:bg-green-950/20 border-green-300 dark:border-green-800/60" 
-                : "bg-muted/55 dark:bg-muted/10 border-light-border"
+                : "bg-muted/55 dark:bg-muted/10 border-border"
             }`}>
               <div className="flex items-center justify-between">
                 <span className={`text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 ${
@@ -272,8 +272,8 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
             )}
 
             {(showCustomForm || !isActualMismatch) && (
-              <div className="p-4 bg-muted border border-light-border rounded-lg space-y-3 animate-in fade-in">
-                <h4 className="text-xs font-bold text-primary-text">Configure Technology Stack</h4>
+              <div className="p-4 bg-muted border border-border rounded-lg space-y-3 animate-in fade-in">
+                <h4 className="text-xs font-bold text-foreground">Configure Technology Stack</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[11px] font-semibold text-secondary-text mb-1">Target Language</label>
@@ -331,7 +331,7 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
         {/* Footer Actions */}
         <div className="p-4 bg-muted/70 border-t border-light-border flex items-center justify-between gap-3">
           <Button 
-            variant="secondary" 
+            variant="default" 
             onClick={onGoBack}
             className="text-xs"
             leftIcon={<ArrowLeft className="w-4 h-4" />}
