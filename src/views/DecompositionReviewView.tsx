@@ -414,9 +414,9 @@ export const DecompositionReviewView: React.FC = () => {
           <Button 
             variant="secondary"
             onClick={() => navigate(`/session/${id}/upload`)} 
-            className="flex items-center gap-1.5 text-xs shadow-xs"
+            className="text-xs shadow-xs"
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
           >
-            <ArrowLeft className="w-4 h-4" />
             Back to Upload
           </Button>
           <Button onClick={handleApprove} className="shadow-md">
@@ -499,7 +499,7 @@ export const DecompositionReviewView: React.FC = () => {
           <h3 className="font-dropdown-label border-b border-light-border pb-3 mb-4 text-primary-orange flex justify-between items-center">
             <span>Extracted Business Rules & Acceptance Criteria</span>
             <div className="flex gap-2 items-center">
-              <Button size="sm" variant="secondary" onClick={() => isAddingRule ? setIsAddingRule(false) : handleOpenAddRule()} className="text-xs px-2 py-0.5 h-auto" leftIcon={<PlusCircle className="w-3 h-3" />}>
+              <Button size="sm" variant="secondary" onClick={() => isAddingRule ? setIsAddingRule(false) : handleOpenAddRule()} className="text-xs " leftIcon={<PlusCircle className="w-3 h-3" />}>
                 Add Rule
               </Button>
               <Badge variant="warning" className="text-xs px-2 py-0.5 font-mono">{rules.length} Rules</Badge>

@@ -17,7 +17,7 @@ const variantStyles: Record<NonNullable<ButtonProps['variant']>, string> = {
   default:
     'bg-primary text-primary-foreground hover:bg-hover-orange shadow-sm',
   secondary:
-    'bg-secondary text-secondary-foreground hover:bg-sidebar-bg shadow-sm',
+    'bg-secondary text-secondary-foreground hover:bg-hover-orange shadow-sm',
   outline:
     'border border-light-border bg-secondary text-primary-foreground hover:bg-primary-hover shadow-sm',
   ghost: 'bg-transparent text-foreground hover:bg-primary-hover',

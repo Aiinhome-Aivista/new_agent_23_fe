@@ -139,18 +139,18 @@ export const MissingCodeModal: React.FC<MissingCodeModalProps> = ({
           <Button 
             variant="secondary" 
             onClick={onGoBack}
-            className="flex items-center gap-2 text-xs"
+            className="text-xs"
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
           >
-            <ArrowLeft className="w-4 h-4" />
             Go Back to Upload
           </Button>
 
           <Button 
             onClick={onContinue}
-            className="flex items-center gap-2 text-xs shadow-md"
+            className="text-xs shadow-md"
+            rightIcon={<ArrowRight className="w-4 h-4" />}
           >
             Continue Without These
-            <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </div>

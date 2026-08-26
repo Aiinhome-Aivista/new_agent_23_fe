@@ -289,7 +289,7 @@ export const UploadArtifactsView: React.FC = () => {
           </div>
           
           {/* Target Stack Indicator Pill */}
-          <div className="flex items-center gap-2 bg-input-bg border border-light-border px-3 py-1.5 rounded-lg text-xs font-medium text-primary-text shadow-2xs">
+          <div className="flex items-center gap-2 bg-input-bg/60 border border-light-border px-3 py-1.5 rounded-lg text-xs font-medium text-primary-text shadow-2xs">
             <Cpu className="w-4 h-4 text-primary-orange" />
             <span>Target: <strong>{techProfile?.language || 'Java'}</strong> ({techProfile?.framework || 'JUnit 5'})</span>
             <button

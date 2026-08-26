@@ -275,9 +275,9 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
                     size="sm"
                     onClick={handleSaveCustom}
                     disabled={isSwitching}
-                    className="text-xs flex items-center gap-1.5"
+                    className="text-xs"
+                    leftIcon={<Check className="w-3.5 h-3.5" />}
                   >
-                    <Check className="w-3.5 h-3.5" />
                     Save & Apply Stack
                   </Button>
                 </div>
@@ -291,9 +291,9 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
           <Button 
             variant="secondary" 
             onClick={onGoBack}
-            className="flex items-center gap-2 text-xs"
+            className="text-xs"
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
           >
-            <ArrowLeft className="w-4 h-4" />
             Go Back to Upload
           </Button>
 
