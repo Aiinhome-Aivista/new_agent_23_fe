@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
-import { UploadCloud, CheckCircle2, GitBranch, FolderOpen, Settings2, FileText, Plus, Eye, EyeOff, Cpu, Check, X } from 'lucide-react';
+import { UploadCloud, CheckCircle2, GitBranch, FolderOpen, Settings2, FileText, Plus, Eye, EyeOff, Cpu, Check, X, Globe, Mail } from 'lucide-react';
 import api from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -433,75 +433,124 @@ export const UploadArtifactsView: React.FC = () => {
           {jiraStatus === 'error' && <span className="ml-2 flex items-center gap-1 text-[11px] font-bold text-primary-orange bg-input-bg border border-orange-border px-2 py-0.5 rounded-full">Connection Failed</span>}
         </h3>
         
-        <div className="space-y-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-secondary-text mb-1">Jira Instance URL</label>
-              <Input
-                type="text"
-                placeholder="e.g. https://your-domain.atlassian.net"
-                value={jiraUrl}
-                onChange={(e) => setJiraUrl(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-secondary-text mb-1">Project Name (or Key)</label>
-              <Input
-                type="text"
-                placeholder="e.g. PROJ or My Project"
-                value={jiraProject}
-                onChange={(e) => setJiraProject(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-secondary-text mb-1">Email Address</label>
-              <Input
-                type="email"
-                placeholder="e.g. your-email@company.com"
-                value={jiraEmail}
-                onChange={(e) => setJiraEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-secondary-text mb-1">API Token</label>
-              <div className="relative">
-                <Input
-                  type={showJiraToken ? "text" : "password"}
-                  placeholder="Your Jira API Token"
-                  value={jiraToken}
-                  onChange={(e) => setJiraToken(e.target.value)}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowJiraToken(!showJiraToken)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-text hover:text-primary-text"
-                >
-                  {showJiraToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+        {jiraStatus === 'success' ? (
+          <div className="bg-card border border-light-border border-l-4 border-l-green-500 rounded-lg p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in shadow-xs mb-6">
+            <div className="flex items-start gap-4">
+              <div className="p-2.5 bg-green-50 dark:bg-green-950/30 text-green-600 dark:text-green-400 rounded-lg border border-green-100 dark:border-green-900/50 animate-pulse">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2.5">
+                  <h4 className="font-bold text-sm text-primary-text">Connected to Jira</h4>
+                  <span className="flex items-center gap-1 text-[10px] font-bold text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-900/50 px-2 py-0.5 rounded-full">
+                    Active Session
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2.5 text-xs text-secondary-text font-mono mt-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-placeholder font-sans w-32 shrink-0 flex items-center gap-1.5">
+                      <Globe className="w-3.5 h-3.5 text-placeholder" />
+                      Instance URL:
+                    </span> 
+                    <span className="text-primary-text font-semibold break-all bg-muted/60 dark:bg-muted/30 px-2.5 py-1 rounded-md border border-light-border shadow-3xs">{jiraUrl.replace(/^https?:\/\//, '').split('/')[0]}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-placeholder font-sans w-32 shrink-0 flex items-center gap-1.5">
+                      <FolderOpen className="w-3.5 h-3.5 text-placeholder" />
+                      Project Key:
+                    </span> 
+                    <span className="text-primary-text font-semibold break-all bg-muted/60 dark:bg-muted/30 px-2.5 py-1 rounded-md border border-light-border shadow-3xs">{jiraProject}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-placeholder font-sans w-32 shrink-0 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-placeholder" />
+                      Connected User:
+                    </span> 
+                    <span className="text-primary-text font-semibold break-all bg-muted/60 dark:bg-muted/30 px-2.5 py-1 rounded-md border border-light-border shadow-3xs">{jiraEmail}</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Button 
-              type="button" 
-              variant="outline"
-              onClick={fetchTickets}
-              disabled={loadingTickets}
-            >
-              {loadingTickets ? 'Connecting & Syncing...' : jiraStatus === 'success' ? 'Sync Tickets' : 'Connect'}
-            </Button>
-            {jiraStatus === 'success' && (
+            <div className="flex sm:flex-row md:flex-row items-center gap-2.5 self-end md:self-center w-full md:w-auto justify-end">
+              <Button 
+                type="button" 
+                onClick={fetchTickets}
+                disabled={loadingTickets}
+                className="text-xs px-4 py-2 flex items-center gap-1.5 shadow-sm hover:opacity-95"
+              >
+                <Cpu className="w-3.5 h-3.5 animate-spin" style={{ display: loadingTickets ? 'inline' : 'none' }} />
+                {loadingTickets ? 'Syncing...' : 'Sync Tickets'}
+              </Button>
               <Button
                 type="button"
-                variant="outline"
                 onClick={handleDisconnect}
+                className="text-xs px-4 py-2 shadow-sm hover:opacity-95"
               >
                 Disconnect
               </Button>
-            )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-secondary-text mb-1">Jira Instance URL</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. https://your-domain.atlassian.net"
+                  value={jiraUrl}
+                  onChange={(e) => setJiraUrl(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-secondary-text mb-1">Project Name (or Key)</label>
+                <Input
+                  type="text"
+                  placeholder="e.g. PROJ or My Project"
+                  value={jiraProject}
+                  onChange={(e) => setJiraProject(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-secondary-text mb-1">Email Address</label>
+                <Input
+                  type="email"
+                  placeholder="e.g. your-email@company.com"
+                  value={jiraEmail}
+                  onChange={(e) => setJiraEmail(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-secondary-text mb-1">API Token</label>
+                <div className="relative">
+                  <Input
+                    type={showJiraToken ? "text" : "password"}
+                    placeholder="Your Jira API Token"
+                    value={jiraToken}
+                    onChange={(e) => setJiraToken(e.target.value)}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowJiraToken(!showJiraToken)}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-text hover:text-primary-text"
+                  >
+                    {showJiraToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                type="button" 
+                onClick={fetchTickets}
+                disabled={loadingTickets}
+              >
+                {loadingTickets ? 'Connecting...' : 'Connect'}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {loadingTickets ? (
           <p className="text-sm text-secondary-text">Fetching tickets from Jira...</p>
@@ -533,9 +582,9 @@ export const UploadArtifactsView: React.FC = () => {
               );
             })}
           </div>
-        ) : (
-          <p className="text-sm text-secondary-text">No Jira tickets available.</p>
-        )}
+        ) : jiraStatus === 'success' ? (
+          <p className="text-sm text-secondary-text">No active Jira tickets found for this project.</p>
+        ) : null}
       </div>
 
       {/* Git Connection Section */}

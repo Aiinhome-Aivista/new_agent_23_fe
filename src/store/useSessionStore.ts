@@ -26,12 +26,8 @@ interface SessionState {
 export const useSessionStore = create<SessionState>()(
   persist(
     (set) => ({
-      user: {
-        name: 'Lead Solution Architect',
-        email: 'architect@enterprise.com',
-        role: 'Enterprise Architect',
-      },
-      isAuthenticated: true,
+      user: null,
+      isAuthenticated: false,
       sessionId: null,
       currentStep: 1,
       techProfile: null,

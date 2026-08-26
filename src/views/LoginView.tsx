@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Cpu, Lock, Mail, Eye, EyeOff, User, ArrowRight } from 'lucide-react';
 import { useSessionStore } from '../store/useSessionStore';
@@ -9,7 +9,13 @@ import { Card } from '../components/ui/Card';
 
 export const LoginView: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useSessionStore();
+  const { login, isAuthenticated } = useSessionStore();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/new-session');
+    }
+  }, [isAuthenticated, navigate]);
 
   const [isRegister, setIsRegister] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
