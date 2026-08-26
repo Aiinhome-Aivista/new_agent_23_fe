@@ -559,7 +559,7 @@ export const UploadArtifactsView: React.FC = () => {
             {jiraTickets.map(ticket => {
               const isSelected = files.some(f => f.name === `${ticket.id}.json`) || existingArtifacts.some(a => a.filename === `${ticket.id}.json`);
               return (
-                <div key={ticket.id} className={`flex justify-between items-start p-4 border rounded transition-colors ${isSelected ? 'border-orange-border bg-input-bg' : 'border-light-border bg-card hover:border-orange-border'}`}>
+                <div key={ticket.id} className={`flex justify-between items-start p-4 border rounded-lg transition-colors ${isSelected ? 'border-orange-border bg-background' : 'border-light-border bg-card hover:border-orange-border'}`}>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-bold bg-input-bg border border-orange-border text-primary-orange px-2 py-0.5 rounded">{ticket.id}</span>

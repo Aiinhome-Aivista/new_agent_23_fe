@@ -225,10 +225,10 @@ export const DecompositionReviewView: React.FC = () => {
           api.get(`/sessions/${id}/decompositions`),
           api.get(`/sessions/${id}/services`)
         ]);
-        
+
         const hasDecomps = decompRes.data?.decompositions?.length > 0;
         const hasServices = servRes.data?.services?.length > 0;
-        
+
         if (decompRes.data?.tech_profile) {
           setCurrentTechProfile(decompRes.data.tech_profile);
         }
@@ -246,7 +246,7 @@ export const DecompositionReviewView: React.FC = () => {
           setRules(decompRes.data.decompositions);
           if (decompRes.data.gap_summary) {
             setGapSummary(decompRes.data.gap_summary);
-            
+
             // Auto-trigger missing code modal if items exist and hasn't been dismissed
             if (decompRes.data.gap_summary.has_missing_items && !missingModalTriggered && !hasUserDismissedModal) {
               // If language modal is not open, open missing modal
@@ -260,7 +260,7 @@ export const DecompositionReviewView: React.FC = () => {
         if (hasServices) {
           setServices(servRes.data.services);
         }
-        
+
         if (hasDecomps && hasServices) {
           setLoading(false);
           clearInterval(intervalId);
@@ -308,7 +308,7 @@ export const DecompositionReviewView: React.FC = () => {
     return (
       <Card className="flex flex-col items-center justify-center min-h-[400px] mt-20 p-10 max-w-2xl mx-auto shadow-sm border-light-border">
         <div className="w-16 h-16 border-4 border-primary-orange border-t-transparent rounded-full animate-spin mb-6"></div>
-        <h3 className="font-main-heading text-lg font-semibold text-primary-text mb-2 animate-pulse">
+        <h3 className="font-main-heading text-lg font-semibold text-foreground mb-2 animate-pulse">
           AI Agent is analyzing your codebase and sprint...
         </h3>
         <p className="text-sm text-secondary-text text-center max-w-md">
@@ -366,7 +366,7 @@ export const DecompositionReviewView: React.FC = () => {
       )}
 
       {/* Missing Code Pop-up Modal */}
-      <MissingCodeModal 
+      <MissingCodeModal
         isOpen={showMissingModal && !showLanguageModal}
         onClose={() => setShowMissingModal(false)}
         onContinue={() => {
@@ -413,9 +413,9 @@ export const DecompositionReviewView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button 
+          <Button
             variant="secondary"
-            onClick={() => navigate(`/session/${id}/upload`)} 
+            onClick={() => navigate(`/session/${id}/upload`)}
             className="text-xs shadow-xs"
             leftIcon={<ArrowLeft className="w-4 h-4" />}
           >
@@ -434,54 +434,54 @@ export const DecompositionReviewView: React.FC = () => {
         languageMismatch?.detected_language &&
         languageMismatch.selected_language.trim().toLowerCase() !== languageMismatch.detected_language.trim().toLowerCase()
       ) && languageMismatch && (
-        <div className="p-3.5 bg-red-500/10 border-2 border-red-400 dark:border-red-800 rounded-lg flex items-center justify-between shadow-2xs animate-in fade-in">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-100 dark:bg-red-950/70 border border-red-300 rounded-md text-red-600">
-              <AlertTriangle className="w-4 h-4 text-red-600 animate-pulse" />
+          <div className="p-3.5 bg-card border-2 border-border rounded-lg flex items-center justify-between shadow-2xs animate-in fade-in">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-input border border-border rounded-md text-primary-text">
+                <AlertTriangle className="w-4 h-4 animate-pulse" />
+              </div>
+              <div>
+                <span className="text-xs font-bold text-primary-text">
+                  Technology Mismatch: Selected {languageMismatch.selected_language}, but Repository contains {languageMismatch.detected_language} Code
+                </span>
+                <p className="text-[11px] text-secondary-text">
+                  Your unit test suite is set to generate in {languageMismatch.selected_language}. Click to auto-switch to {languageMismatch.detected_language} or adjust settings.
+                </p>
+              </div>
             </div>
-            <div>
-              <span className="text-xs font-bold text-red-700 dark:text-red-400">
-                Technology Mismatch: Selected {languageMismatch.selected_language}, but Repository contains {languageMismatch.detected_language} Code
-              </span>
-              <p className="text-[11px] text-secondary-text">
-                Your unit test suite is set to generate in {languageMismatch.selected_language}. Click to auto-switch to {languageMismatch.detected_language} or adjust settings.
-              </p>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                onClick={() => handleAutoSwitchLanguage(
+                  languageMismatch.detected_language || 'Python',
+                  languageMismatch.recommended_framework || 'Pytest',
+                  languageMismatch.recommended_mock_library || 'pytest-mock'
+                )}
+                className="text-xs bg-primary-orange hover:bg-hover-orange shadow-sm"
+                leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
+              >
+                Switch to {languageMismatch.detected_language}
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => setShowLanguageModal(true)}
+                className="text-xs"
+              >
+                Change Options
+              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              size="sm" 
-              onClick={() => handleAutoSwitchLanguage(
-                languageMismatch.detected_language || 'Python',
-                languageMismatch.recommended_framework || 'Pytest',
-                languageMismatch.recommended_mock_library || 'pytest-mock'
-              )}
-              className="text-xs bg-primary-orange hover:bg-hover-orange flex items-center gap-1.5 shadow-sm"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Switch to {languageMismatch.detected_language}
-            </Button>
-            <Button 
-              size="sm" 
-              variant="secondary" 
-              onClick={() => setShowLanguageModal(true)}
-              className="text-xs"
-            >
-              Change Options
-            </Button>
-          </div>
-        </div>
-      )}
+        )}
 
       {/* Missing Items Alert Banner */}
       {missingItemsList.length > 0 && (
-        <div className="p-3.5 bg-amber-500/10 border border-orange-border/80 rounded-lg flex items-center justify-between shadow-2xs animate-in fade-in">
+        <div className="p-3.5 bg-input border border-border rounded-lg flex items-center justify-between shadow-2xs animate-in fade-in">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 bg-orange-100 dark:bg-orange-950/60 border border-orange-300 rounded-md text-primary-orange">
+            <div className="p-1.5 bg-input border border-border rounded-md text-primary-orange">
               <AlertTriangle className="w-4 h-4 text-primary-orange" />
             </div>
             <div>
-              <span className="text-xs font-bold text-primary-text">
+              <span className="text-xs font-bold text-primary">
                 {missingItemsList.length} Story Requirement(s) / Functions Not Found in Codebase
               </span>
               <p className="text-[11px] text-secondary-text">
@@ -489,11 +489,11 @@ export const DecompositionReviewView: React.FC = () => {
               </p>
             </div>
           </div>
-          <Button 
-            size="sm" 
-            variant="secondary" 
+          <Button
+            size="sm"
+            variant="secondary"
             onClick={() => setShowMissingModal(true)}
-            className="text-xs border-orange-300 hover:border-primary-orange text-primary-orange"
+            className="text-xs"
           >
             View Missing Items ({missingItemsList.length})
           </Button>
@@ -512,11 +512,11 @@ export const DecompositionReviewView: React.FC = () => {
               <Badge variant="warning" className="text-xs px-2 py-0.5 font-mono">{rules.length} Rules</Badge>
             </div>
           </h3>
-          
+
           {isAddingRule && (
-            <div className="p-4 bg-orange-500/5 dark:bg-orange-950/20 border-2 border-primary-orange/60 rounded-lg mb-4 shadow-md space-y-3 animate-in fade-in">
+            <div className="p-4 bg-card border-2 border-border rounded-lg mb-4 shadow-md space-y-3 animate-in fade-in">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-primary-text flex items-center gap-1.5">
+                <h4 className="text-sm font-bold text-foreground flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-primary-orange" />
                   Add Custom Rule (AI Story Alignment Check Enabled)
                 </h4>
@@ -529,17 +529,17 @@ export const DecompositionReviewView: React.FC = () => {
                 <div className="w-1/3 flex flex-col gap-1">
                   <div className="flex items-center justify-between text-[11px] font-semibold text-secondary-text">
                     <span>Rule Code</span>
-                    <span className="text-[10px] bg-primary-orange/15 text-primary-orange font-mono font-bold px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] bg-input text-primary-orange font-mono font-bold px-1.5 py-0.5 rounded">
                       Auto: {getPrefixForRuleType(newRule.rule_type)}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <input 
-                      type="text" 
-                      placeholder="BR-001" 
+                    <input
+                      type="text"
+                      placeholder="BR-001"
                       className="bg-card text-primary-text text-sm rounded border border-border p-1.5 w-full font-mono font-bold text-primary-orange"
                       value={newRule.rule_code}
-                      onChange={(e) => setNewRule({...newRule, rule_code: e.target.value})}
+                      onChange={(e) => setNewRule({ ...newRule, rule_code: e.target.value })}
                     />
                     <button
                       type="button"
@@ -554,7 +554,7 @@ export const DecompositionReviewView: React.FC = () => {
 
                 <div className="flex-1 flex flex-col gap-1">
                   <span className="text-[11px] font-semibold text-secondary-text">Rule Type</span>
-                  <select 
+                  <select
                     className="bg-card text-primary-text text-sm rounded border border-border p-1.5 w-full"
                     value={newRule.rule_type}
                     onChange={(e) => handleRuleTypeChange(e.target.value)}
@@ -567,28 +567,28 @@ export const DecompositionReviewView: React.FC = () => {
                 </div>
               </div>
 
-              <input 
+              <input
                 type="text"
                 placeholder="Story / Feature Name (e.g. User Registration)..."
                 className="bg-card text-primary-text text-sm rounded border border-border p-1.5 w-full text-xs"
                 value={newRule.story_name}
-                onChange={(e) => setNewRule({...newRule, story_name: e.target.value})}
+                onChange={(e) => setNewRule({ ...newRule, story_name: e.target.value })}
               />
-              <textarea 
-                placeholder="Rule Details & Acceptance Criteria..." 
+              <textarea
+                placeholder="Rule Details & Acceptance Criteria..."
                 className="bg-card text-primary-text text-sm rounded border border-border p-2 w-full h-20 text-xs"
                 value={newRule.rule_text}
-                onChange={(e) => setNewRule({...newRule, rule_text: e.target.value})}
+                onChange={(e) => setNewRule({ ...newRule, rule_text: e.target.value })}
               />
 
               {/* Validation Rejection / Error Alert */}
               {validationError && (
-                <div className="p-3.5 bg-red-500/10 border-2 border-red-500 rounded-md text-xs space-y-1 animate-in fade-in">
-                  <div className="flex items-center gap-2 font-bold text-red-600 dark:text-red-400">
-                    <XCircle className="w-4 h-4 text-red-600 shrink-0" />
+                <div className="p-3.5 bg-card border-2 border-border rounded-md text-xs space-y-1 animate-in fade-in">
+                  <div className="flex items-center gap-2 font-bold text-primary-text">
+                    <XCircle className="w-4 h-4 shrink-0" />
                     <span>INVALID RULE / STORY MISMATCH (Rule Not Added)</span>
                   </div>
-                  <p className="text-red-700 dark:text-red-300 pl-6 leading-relaxed">
+                  <p className="text-secondary-text pl-6 leading-relaxed">
                     {validationError}
                   </p>
                   <p className="text-[11px] text-secondary-text pl-6 italic">
@@ -599,21 +599,21 @@ export const DecompositionReviewView: React.FC = () => {
 
               {/* Validation Success Alert */}
               {validationFeedback && validationFeedback.is_valid && !validationError && (
-                <div className="p-3.5 bg-green-500/10 border-2 border-green-500 rounded-md text-xs space-y-1.5 animate-in fade-in">
+                <div className="p-3.5 bg-card border-2 border-border rounded-md text-xs space-y-1.5 animate-in fade-in">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-bold text-green-700 dark:text-green-400">
-                      <Check className="w-4 h-4 text-green-600 shrink-0" />
+                    <div className="flex items-center gap-2 font-bold text-primary-text">
+                      <Check className="w-4 h-4 shrink-0" />
                       <span>STORY ALIGNMENT VERIFIED • Score: {validationFeedback.match_score}%</span>
                     </div>
-                    <span className="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase">
+                    <span className="text-[10px] bg-input text-secondary-text border border-border font-bold px-2 py-0.5 rounded-full uppercase">
                       {validationFeedback.alignment_status}
                     </span>
                   </div>
-                  <p className="text-green-800 dark:text-green-300 pl-6 leading-relaxed">
+                  <p className="text-secondary-text pl-6 leading-relaxed">
                     {validationFeedback.feedback}
                   </p>
                   {validationFeedback.suggested_rule_text && validationFeedback.suggested_rule_text !== newRule.rule_text && (
-                    <div className="mt-2 pl-6 pt-2 border-t border-green-200 dark:border-green-800 flex items-center justify-between gap-2">
+                    <div className="mt-2 pl-6 pt-2 border-t border-border flex items-center justify-between gap-2">
                       <span className="text-[11px] text-secondary-text">AI Enhanced Wording available</span>
                       <button
                         type="button"
@@ -628,23 +628,23 @@ export const DecompositionReviewView: React.FC = () => {
               )}
 
               <div className="flex items-center justify-between pt-1">
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={handleValidateRule}
                   disabled={isValidating || isSavingRule || !newRule.rule_code || !newRule.rule_text}
-                  className="text-xs font-bold flex items-center gap-1.5 border-2 border-primary-orange text-primary-orange bg-card hover:bg-orange-500/10 dark:hover:bg-orange-950/40 disabled:opacity-50 disabled:border-primary-orange/40 shadow-xs"
+                  className="text-xs font-bold border-2 border-primary-orange text-primary-orange bg-card hover:bg-orange-500/10 dark:hover:bg-orange-950/40 disabled:opacity-50 disabled:border-primary-orange/40 shadow-xs"
+                  leftIcon={<Sparkles className={`w-3.5 h-3.5 text-primary-orange ${isValidating ? 'animate-spin' : ''}`} />}
                 >
-                  <Sparkles className={`w-3.5 h-3.5 text-primary-orange ${isValidating ? 'animate-spin' : ''}`} />
                   <span className="text-primary-orange font-bold">
                     {isValidating ? 'Checking Story Match...' : 'Validate with LLM'}
                   </span>
                 </Button>
 
                 <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="secondary" 
+                  <Button
+                    size="sm"
+                    variant="secondary"
                     onClick={() => {
                       setIsAddingRule(false);
                       setValidationError(null);
@@ -653,13 +653,13 @@ export const DecompositionReviewView: React.FC = () => {
                   >
                     Cancel
                   </Button>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     onClick={handleAddRule}
                     disabled={isSavingRule || isValidating}
-                    className="flex items-center gap-1.5 shadow-sm"
+                    className="shadow-sm"
+                    leftIcon={<Check className={`w-3.5 h-3.5 ${isSavingRule ? 'animate-spin' : ''}`} />}
                   >
-                    <Check className={`w-3.5 h-3.5 ${isSavingRule ? 'animate-spin' : ''}`} />
                     {isSavingRule ? 'Validating & Saving...' : 'Save Rule'}
                   </Button>
                 </div>
@@ -671,33 +671,32 @@ export const DecompositionReviewView: React.FC = () => {
             {rules.map((rule, idx) => {
               const isMissing = rule.has_code_mapping === false;
               return (
-                <div 
-                  key={idx} 
-                  className={`p-4 bg-card border rounded-md transition-all shadow-2xs ${
-                    isMissing ? 'border-amber-300 bg-amber-50/40 dark:bg-amber-950/20' : 'border-border hover:border-orange-border'
-                  }`}
+                <div
+                  key={idx}
+                  className={`p-4 border rounded-md transition-all shadow-2xs ${isMissing ? 'bg-card border-border' : 'bg-card border-border hover:border-orange-border'
+                    }`}
                 >
                   <div className="flex justify-between items-center mb-1.5 flex-wrap gap-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-primary-orange uppercase font-mono">{rule.rule_code}</span>
                       {rule.story_name && (
-                        <span className="text-xs font-semibold text-primary-text">
+                        <span className="text-xs font-semibold text-foreground">
                           • {rule.story_name}
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {rule.ai_validation_score && (
-                        <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                        <span className="text-[10px] bg-card text-primary-text border border-border px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
                           <Sparkles className="w-2.5 h-2.5" /> Match: {rule.ai_validation_score}%
                         </span>
                       )}
                       {isMissing ? (
-                        <span className="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-full font-bold">
+                        <span className="text-[10px] bg-card text-primary-text border border-border px-2 py-0.5 rounded-full font-bold">
                           ⚠️ No Code in Repo
                         </span>
                       ) : (
-                        <span className="text-[10px] bg-green-100 text-green-800 border border-green-300 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                        <span className="text-[10px] bg-card text-primary-text border border-border px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" /> Code Mapped
                         </span>
                       )}
@@ -705,7 +704,7 @@ export const DecompositionReviewView: React.FC = () => {
                     </div>
                   </div>
                   <p className="font-instruction-text text-sm text-secondary-text mt-1">{rule.rule_text}</p>
-                  
+
                   {rule.ai_feedback && (
                     <div className="mt-2 pt-1.5 border-t border-light-border text-[11px] text-secondary-text flex items-center gap-1">
                       <Sparkles className="w-3 h-3 text-primary-orange shrink-0" />
@@ -714,7 +713,7 @@ export const DecompositionReviewView: React.FC = () => {
                   )}
 
                   {isMissing && rule.missing_reason && (
-                    <div className="mt-2 pt-1.5 border-t border-amber-200/60 text-[11px] text-amber-700 dark:text-amber-400 italic">
+                    <div className="mt-2 pt-1.5 border-t border-border text-[11px] text-secondary-text italic">
                       {rule.missing_reason}
                     </div>
                   )}

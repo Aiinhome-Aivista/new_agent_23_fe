@@ -71,7 +71,7 @@ export const MissingCodeModal: React.FC<MissingCodeModalProps> = ({
         {/* Modal Body: Stats & Missing Items List */}
         <div className="p-6 overflow-y-auto space-y-4 flex-1">
           {/* Summary Banner */}
-          <div className="bg-input-bg border border-light-border rounded-lg p-3.5 flex items-center justify-between text-xs">
+          <div className="bg-input border border-light-border rounded-lg p-3.5 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-secondary-text">
               <CheckCircle2 className="w-4 h-4 text-green-600" />
               <span>Mapped in Codebase: <strong className="text-foreground">{mappedRules}</strong> / {totalRules || (mappedRules + missingItems.length)} rules</span>
@@ -91,7 +91,7 @@ export const MissingCodeModal: React.FC<MissingCodeModalProps> = ({
             {missingItems.map((item, idx) => (
               <div 
                 key={idx}
-                className="p-3.5 bg-input-bg/70 border border-orange-200 dark:border-orange-950/60 rounded-lg space-y-2 hover:border-orange-400 transition-colors shadow-2xs"
+                className="p-3.5 bg-input-bg/70 border border-border rounded-lg space-y-2 hover:border-light-border transition-colors shadow-2xs"
               >
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -100,7 +100,7 @@ export const MissingCodeModal: React.FC<MissingCodeModalProps> = ({
                         {item.rule_code}
                       </span>
                     )}
-                    <span className="text-xs font-bold text-primary-text">
+                    <span className="text-xs font-bold text-foreground">
                       {item.story_name || 'Story Requirement'}
                     </span>
                   </div>
