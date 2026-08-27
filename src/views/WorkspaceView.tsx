@@ -558,6 +558,20 @@ export const WorkspaceView: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reviewReport, setReviewReport] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'matrix' | 'audit'>('matrix');
+  const [isDarkMode, setIsDarkMode] = useState(document.documentElement.classList.contains('dark'));
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          setIsDarkMode(document.documentElement.classList.contains('dark'));
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   const fetchReviewReport = async () => {
     if (!id) return;
@@ -664,7 +678,7 @@ export const WorkspaceView: React.FC = () => {
   };
 
   return (
-    <div className="mt-2 flex flex-col h-[calc(100vh-100px)] relative font-sans">
+    <div className="flex flex-col h-[80vh] relative font-sans">
       {/* Top Header & Coverage Metrics Dashboard */}
       <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-xs flex justify-between items-center">
         <div className="flex items-center gap-4">
@@ -690,15 +704,24 @@ export const WorkspaceView: React.FC = () => {
           <Button 
             variant="outline"
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-2 bg-card text-primary-text hover:bg-orange-50 hover:border-orange-300 font-medium text-xs py-2 px-3"
+            className="bg-card text-primary-text hover:bg-orange-50 hover:border-orange-300 font-medium text-xs py-2 px-3"
+            leftIcon={<Settings2 className="w-4 h-4 text-primary-orange" />}
           >
-            <Settings2 className="w-4 h-4 text-primary-orange" /> Resolve Ambiguities (HITL)
+            Resolve Ambiguities (HITL)
           </Button>
-          <Button onClick={handleDownloadReport} className="flex items-center gap-2 shadow-xs text-xs py-2 px-3">
-            <Download className="w-4 h-4" /> Word Report (.docx)
+          <Button 
+            onClick={handleDownloadReport} 
+            className="shadow-xs text-xs py-2 px-3"
+            leftIcon={<Download className="w-4 h-4" />}
+          >
+            Word Report (.docx)
           </Button>
-          <Button onClick={handleDownloadZip} className="flex items-center gap-2 shadow-xs text-xs py-2 px-3">
-            <Download className="w-4 h-4" /> Export Test Package (.zip)
+          <Button 
+            onClick={handleDownloadZip} 
+            className="shadow-xs text-xs py-2 px-3"
+            leftIcon={<Download className="w-4 h-4" />}
+          >
+            Export Test Package (.zip)
           </Button>
         </div>
       </div>
@@ -770,7 +793,7 @@ export const WorkspaceView: React.FC = () => {
               <div className="flex-1 overflow-y-auto p-3 space-y-3">
                 <h4 className="text-[11px] font-bold text-text-secondary uppercase tracking-wider">Requirement Scenarios:</h4>
                 {matrix.map((item, idx) => (
-                  <div key={idx} className="p-3 border border-light-border rounded-md bg-input hover:bg-white hover:border-orange-300 transition-all text-xs">
+                  <div key={idx} className="p-3 border border-light-border rounded-md bg-input hover:bg-background hover:border-orange-300 transition-all text-xs">
                     <div className="flex justify-between items-center mb-1.5">
                       <span className="font-mono font-bold text-primary-orange">{item.rule_code}</span>
                       <Badge variant={item.status === 'COVERED' ? 'success' : 'warning'} className="text-[10px] font-bold">
@@ -889,7 +912,7 @@ export const WorkspaceView: React.FC = () => {
             <Editor
               height="100%"
               defaultLanguage="java"
-              theme="vs-dark"
+              theme={isDarkMode ? "vs-dark" : "vs-light"}
               value={code}
               onChange={(val) => setCode(val || '')}
               options={{

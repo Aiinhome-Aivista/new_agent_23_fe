@@ -109,9 +109,9 @@ export const LanguageMismatchModal: React.FC<LanguageMismatchModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-background/50 backdrop-blur-sm rounded-xl animate-in fade-in duration-200">
       <div 
-        className="relative w-full max-w-2xl bg-card border-2 border-primary-orange rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-2xl bg-card border-2 border-orange rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in zoom-in-95 duration-200"
         role="dialog"
         aria-modal="true"
       >

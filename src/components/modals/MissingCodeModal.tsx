@@ -35,7 +35,7 @@ export const MissingCodeModal: React.FC<MissingCodeModalProps> = ({
   if (!isOpen || missingItems.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-background/50 backdrop-blur-sm rounded-xl animate-in fade-in duration-200">
       <div 
         className="relative w-full max-w-2xl bg-card border border-orange-border rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200"
         role="dialog"
@@ -137,7 +137,7 @@ export const MissingCodeModal: React.FC<MissingCodeModalProps> = ({
         {/* Modal Footer: Action Buttons */}
         <div className="p-4 bg-muted/60 border-t border-light-border flex items-center justify-between gap-3">
           <Button 
-            variant="secondary" 
+            variant="default" 
             onClick={onGoBack}
             className="text-xs"
             leftIcon={<ArrowLeft className="w-4 h-4" />}

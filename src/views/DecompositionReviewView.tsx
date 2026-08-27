@@ -310,60 +310,62 @@ export const DecompositionReviewView: React.FC = () => {
     }
   };
 
-  // Beautiful Loading Spinner
+  // Modals for loading, error, and empty states
+  let overlayModal = null;
+
   if (loading && rules.length === 0) {
-    return (
-      <Card className="flex flex-col items-center justify-center min-h-[400px] mt-20 p-10 max-w-2xl mx-auto shadow-sm border-light-border">
-        <div className="w-16 h-16 border-4 border-primary-orange border-t-transparent rounded-full animate-spin mb-6"></div>
-        <h3 className="font-main-heading text-lg font-semibold text-foreground mb-2 animate-pulse">
-          AI Agent is analyzing your codebase and sprint...
-        </h3>
-        <p className="text-sm text-secondary-text text-center max-w-md">
-          Please wait while the LLM parses the requirements, clones the git repository, crawls the source code files, and extracts the target business rules.
-        </p>
-        <span className="text-xs text-placeholder mt-4 font-mono">Elapsed time: {timeElapsed}s</span>
-      </Card>
+    overlayModal = (
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-sm rounded-xl">
+        <Card className="flex flex-col items-center justify-center p-10 max-w-2xl mx-auto shadow-2xl border-border bg-card">
+          <div className="w-16 h-16 border-4 border-primary-orange border-t-transparent rounded-full animate-spin mb-6"></div>
+          <h3 className="font-main-heading text-lg font-semibold text-foreground mb-2 animate-pulse">
+            AI Agent is analyzing your codebase and sprint...
+          </h3>
+          <p className="text-sm text-secondary-text text-center max-w-md">
+            Please wait while the LLM parses the requirements, clones the git repository, crawls the source code files, and extracts the target business rules.
+          </p>
+          <span className="text-xs text-placeholder mt-4 font-mono">Elapsed time: {timeElapsed}s</span>
+        </Card>
+      </div>
     );
-  }
-
-  // Git Error State
-  if (gitError) {
-    return (
-      <Card className="flex flex-col items-center justify-center min-h-[400px] mt-20 p-10 max-w-2xl mx-auto shadow-md border-2 border-red-500/50 bg-red-500/5">
-        <div className="p-3 bg-red-100 dark:bg-red-950/70 border border-red-300 rounded-full text-red-600 mb-4">
-          <AlertTriangle className="w-8 h-8 text-red-600 animate-pulse" />
-        </div>
-        <h3 className="font-main-heading text-xl font-bold text-red-600 dark:text-red-400 mb-2">
-          Git Repository Error Detected
-        </h3>
-        <p className="text-xs text-primary-text text-center max-w-md bg-card p-3 rounded border border-red-200 font-mono my-2 leading-relaxed">
-          {gitError}
-        </p>
-        <p className="text-xs text-secondary-text text-center max-w-md mt-1">
-          Please check that your Git repository URL is correct, the branch name (e.g. main/master) exists, and authentication tokens (if private) are valid.
-        </p>
-        <Button onClick={() => navigate(`/session/${id}/upload`)} className="mt-6 bg-primary-orange hover:bg-hover-orange">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Go Back to Upload & Fix Git Settings
-        </Button>
-      </Card>
+  } else if (gitError) {
+    overlayModal = (
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-sm rounded-xl">
+        <Card className="flex flex-col items-center justify-center p-10 max-w-2xl mx-auto shadow-2xl border-2 border-red-500/50 bg-red-500/5">
+          <div className="p-3 bg-red-100 dark:bg-red-950/70 border border-red-300 rounded-full text-red-600 mb-4">
+            <AlertTriangle className="w-8 h-8 text-red-600 animate-pulse" />
+          </div>
+          <h3 className="font-main-heading text-xl font-bold text-red-600 dark:text-red-400 mb-2">
+            Git Repository Error Detected
+          </h3>
+          <p className="text-xs text-primary-text text-center max-w-md bg-card p-3 rounded border border-red-200 font-mono my-2 leading-relaxed">
+            {gitError}
+          </p>
+          <p className="text-xs text-secondary-text text-center max-w-md mt-1">
+            Please check that your Git repository URL is correct, the branch name (e.g. main/master) exists, and authentication tokens (if private) are valid.
+          </p>
+          <Button onClick={() => navigate(`/session/${id}/upload`)} className="mt-6 bg-primary-orange hover:bg-hover-orange">
+            <ArrowLeft className="w-4 h-4 mr-1" /> Go Back to Upload & Fix Git Settings
+          </Button>
+        </Card>
+      </div>
     );
-  }
-
-  // Error/Empty State
-  if (rules.length === 0) {
-    return (
-      <Card className="flex flex-col items-center justify-center min-h-[400px] mt-20 p-10 max-w-2xl mx-auto shadow-sm border-light-border">
-        <AlertTriangle className="w-12 h-12 text-yellow-500 mb-4" />
-        <h3 className="font-main-heading text-lg font-semibold text-primary-text mb-2">
-          No business rules extracted
-        </h3>
-        <p className="text-sm text-secondary-text text-center max-w-md">
-          We couldn't extract any business rules from the uploaded sprint artifacts or connected git repository. Please check your repository URL, branch, and sprint files.
-        </p>
-        <Button onClick={() => navigate(`/session/${id}/upload`)} className="mt-6">
-          Go Back
-        </Button>
-      </Card>
+  } else if (rules.length === 0) {
+    overlayModal = (
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/50 backdrop-blur-sm rounded-xl">
+        <Card className="flex flex-col items-center justify-center p-10 max-w-2xl mx-auto shadow-2xl border-light-border bg-card">
+          <AlertTriangle className="w-12 h-12 text-yellow-500 mb-4" />
+          <h3 className="font-main-heading text-lg font-semibold text-primary-text mb-2">
+            No business rules extracted
+          </h3>
+          <p className="text-sm text-secondary-text text-center max-w-md">
+            We couldn't extract any business rules from the uploaded sprint artifacts or connected git repository. Please check your repository URL, branch, and sprint files.
+          </p>
+          <Button onClick={() => navigate(`/session/${id}/upload`)} className="mt-6">
+            Go Back
+          </Button>
+        </Card>
+      </div>
     );
   }
 
@@ -379,7 +381,8 @@ export const DecompositionReviewView: React.FC = () => {
   const activeFramework = currentTechProfile?.framework || 'JUnit 5';
 
   return (
-    <div className="flex flex-col h-[80vh] space-y-4">
+    <div className="relative flex flex-col h-[80vh] min-h-[600px] space-y-4">
+      {overlayModal}
       {/* Language Mismatch Alert Pop-up Modal */}
       {languageMismatch && (
         <LanguageMismatchModal
