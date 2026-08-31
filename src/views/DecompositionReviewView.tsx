@@ -18,6 +18,7 @@ interface DecompositionItem {
   story?: string;
   has_code_mapping?: boolean;
   missing_reason?: string;
+  target_code_snippet?: string;
   ai_validation_score?: number;
   ai_feedback?: string;
   alignment_status?: string;
@@ -28,6 +29,7 @@ interface ServiceItem {
   name: string;
   methods: string[];
   dependencies: string[];
+  target_code_snippets?: any[];
   status?: string;
 }
 
@@ -738,6 +740,17 @@ export const DecompositionReviewView: React.FC = () => {
                   </div>
                   <p className="font-instruction-text text-sm text-secondary-text mt-1">{rule.rule_text}</p>
 
+                  {rule.target_code_snippet && (
+                    <div className="mt-2.5 pt-2 border-t border-light-border text-xs">
+                      <span className="font-semibold text-primary-orange text-[11px] uppercase block mb-1 flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" /> Identified Code Snippet / Validation Scope:
+                      </span>
+                      <pre className="p-2.5 bg-muted text-foreground text-[11px] font-mono rounded border border-border overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                        {rule.target_code_snippet}
+                      </pre>
+                    </div>
+                  )}
+
                   {rule.ai_feedback && (
                     <div className="mt-2 pt-1.5 border-t border-light-border text-[11px] text-secondary-text flex items-center gap-1">
                       <Sparkles className="w-3 h-3 text-primary-orange shrink-0" />
@@ -776,6 +789,18 @@ export const DecompositionReviewView: React.FC = () => {
                   ))}
                 </div>
               </div>
+              {srv.target_code_snippets && srv.target_code_snippets.length > 0 && (
+                <div className="mt-3">
+                  <span className="text-xs font-semibold text-secondary-text uppercase">Identified Validation Snippets:</span>
+                  <div className="mt-1 space-y-1.5">
+                    {srv.target_code_snippets.map((snip: string, si: number) => (
+                      <pre key={si} className="p-2 bg-muted text-foreground text-[10px] font-mono rounded border border-border overflow-x-auto whitespace-pre-wrap">
+                        {snip}
+                      </pre>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="mt-3">
                 <span className="text-xs font-semibold text-secondary-text uppercase">Mocked Collaborators:</span>
                 <div className="flex flex-wrap gap-1 mt-1">

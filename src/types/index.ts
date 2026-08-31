@@ -19,6 +19,7 @@ export interface ServiceContract {
   name: string;
   methods: any[];
   dependencies: any[];
+  target_code_snippets?: any[];
   status: 'PROPOSED' | 'APPROVED';
 }
 
