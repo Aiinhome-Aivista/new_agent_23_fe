@@ -6,6 +6,7 @@ import api from '../services/api';
 import { useSessionStore } from '../store/useSessionStore';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
+import { StoryFunctionAuditModal, StoryFunctionAnalysisData } from '../components/modals/StoryFunctionAuditModal';
 
 const ENHANCED_USER_SERVICE_TEST = `package com.example.service;
 
@@ -559,6 +560,41 @@ export const WorkspaceView: React.FC = () => {
   const [reviewReport, setReviewReport] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'matrix' | 'audit'>('matrix');
   const [isDarkMode, setIsDarkMode] = useState(document.documentElement.classList.contains('dark'));
+  const [storyFunctionAnalysis, setStoryFunctionAnalysis] = useState<StoryFunctionAnalysisData | null>(null);
+  const [showStoryFunctionModal, setShowStoryFunctionModal] = useState(false);
+  const [isAnalyzingStoryFunctions, setIsAnalyzingStoryFunctions] = useState(false);
+
+  const handleOpenStoryFunctionModal = async () => {
+    setShowStoryFunctionModal(true);
+    if (!storyFunctionAnalysis && id) {
+      setIsAnalyzingStoryFunctions(true);
+      try {
+        const res = await api.get(`/sessions/${id}/story-function-analysis`);
+        if (res.data) {
+          setStoryFunctionAnalysis(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch story function analysis:", err);
+      } finally {
+        setIsAnalyzingStoryFunctions(false);
+      }
+    }
+  };
+
+  const handleReAnalyzeStoryFunctions = async () => {
+    if (!id) return;
+    setIsAnalyzingStoryFunctions(true);
+    try {
+      const res = await api.post(`/sessions/${id}/story-function-analysis`);
+      if (res.data) {
+        setStoryFunctionAnalysis(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to re-analyze story functions:", err);
+    } finally {
+      setIsAnalyzingStoryFunctions(false);
+    }
+  };
 
   useEffect(() => {
     const observer = new MutationObserver((mutations) => {
@@ -700,7 +736,20 @@ export const WorkspaceView: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={handleOpenStoryFunctionModal}
+            className="text-xs shadow-xs border-2 border-primary-orange bg-card text-primary-orange hover:bg-primary-orange hover:text-white font-bold transition-all px-3 py-2"
+            leftIcon={<Code2 className="w-4 h-4 text-inherit" />}
+          >
+            Story Function Audit
+            {storyFunctionAnalysis?.total_functions ? (
+              <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] bg-primary-orange text-white">
+                {storyFunctionAnalysis.total_functions}
+              </span>
+            ) : null}
+          </Button>
           <Button 
             variant="outline"
             onClick={() => setIsModalOpen(true)}
@@ -725,6 +774,15 @@ export const WorkspaceView: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {/* Story Function & Logic Audit Modal */}
+      <StoryFunctionAuditModal
+        isOpen={showStoryFunctionModal}
+        onClose={() => setShowStoryFunctionModal(false)}
+        analysisData={storyFunctionAnalysis}
+        isLoading={isAnalyzingStoryFunctions}
+        onReAnalyze={handleReAnalyzeStoryFunctions}
+      />
 
       {/* Main Split Content Workspace */}
       <div className="flex flex-1 gap-4 overflow-hidden">

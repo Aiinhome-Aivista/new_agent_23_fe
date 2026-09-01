@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
-import { AlertTriangle, PlusCircle, CheckCircle2, ArrowLeft, RefreshCw, Cpu, Sparkles, XCircle, Check } from 'lucide-react';
+import { AlertTriangle, PlusCircle, CheckCircle2, ArrowLeft, RefreshCw, Cpu, Sparkles, XCircle, Check, Code2 } from 'lucide-react';
 import api from '../services/api';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { MissingCodeModal, MissingItem } from '../components/modals/MissingCodeModal';
 import { LanguageMismatchModal, LanguageMismatchData } from '../components/modals/LanguageMismatchModal';
+import { StoryFunctionAuditModal, StoryFunctionAnalysisData } from '../components/modals/StoryFunctionAuditModal';
 
 interface DecompositionItem {
   req_id?: string;
@@ -61,6 +62,11 @@ export const DecompositionReviewView: React.FC = () => {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [hasUserDismissedLangModal, setHasUserDismissedLangModal] = useState(false);
   const [currentTechProfile, setCurrentTechProfile] = useState<any>(storeTechProfile || null);
+
+  // Story Functions & Logic Gap Audit Modal State
+  const [storyFunctionAnalysis, setStoryFunctionAnalysis] = useState<StoryFunctionAnalysisData | null>(null);
+  const [showStoryFunctionModal, setShowStoryFunctionModal] = useState(false);
+  const [isAnalyzingStoryFunctions, setIsAnalyzingStoryFunctions] = useState(false);
 
   // Custom Rule State & LLM Validation
   const [isAddingRule, setIsAddingRule] = useState(false);
@@ -215,6 +221,38 @@ export const DecompositionReviewView: React.FC = () => {
     }
   };
 
+  const handleReAnalyzeStoryFunctions = async () => {
+    if (!id) return;
+    setIsAnalyzingStoryFunctions(true);
+    try {
+      const res = await api.post(`/sessions/${id}/story-function-analysis`);
+      if (res.data) {
+        setStoryFunctionAnalysis(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to re-analyze story functions:", err);
+    } finally {
+      setIsAnalyzingStoryFunctions(false);
+    }
+  };
+
+  const handleOpenStoryFunctionModal = async () => {
+    setShowStoryFunctionModal(true);
+    if (!storyFunctionAnalysis && id) {
+      setIsAnalyzingStoryFunctions(true);
+      try {
+        const res = await api.get(`/sessions/${id}/story-function-analysis`);
+        if (res.data) {
+          setStoryFunctionAnalysis(res.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch story function analysis:", err);
+      } finally {
+        setIsAnalyzingStoryFunctions(false);
+      }
+    }
+  };
+
   useEffect(() => {
     let intervalId: any;
     let seconds = 0;
@@ -234,6 +272,9 @@ export const DecompositionReviewView: React.FC = () => {
 
         if (decompRes.data?.tech_profile) {
           setCurrentTechProfile(decompRes.data.tech_profile);
+          if (decompRes.data.tech_profile.story_function_analysis) {
+            setStoryFunctionAnalysis(decompRes.data.tech_profile.story_function_analysis);
+          }
           if (decompRes.data.tech_profile.git_error) {
             setGitError(decompRes.data.tech_profile.git_error);
             setLoading(false);
@@ -414,6 +455,16 @@ export const DecompositionReviewView: React.FC = () => {
         mappedRules={gapSummary?.mapped_rules || (rules.length - missingItemsList.length)}
       />
 
+      {/* Story Function & Logic Audit Modal */}
+      <StoryFunctionAuditModal
+        isOpen={showStoryFunctionModal}
+        onClose={() => setShowStoryFunctionModal(false)}
+        analysisData={storyFunctionAnalysis}
+        isLoading={isAnalyzingStoryFunctions}
+        onReAnalyze={handleReAnalyzeStoryFunctions}
+        onContinue={handleApprove}
+      />
+
       {/* Header Bar */}
       <div className="flex justify-between items-center flex-wrap gap-4">
         <div>
@@ -447,7 +498,23 @@ export const DecompositionReviewView: React.FC = () => {
           <p className="text-sm text-secondary-text mt-0.5">Verify extracted business rules and service mock dependencies before initiating test generation.</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={handleOpenStoryFunctionModal}
+            className="text-xs shadow-xs border-2 border-primary-orange bg-card text-primary-orange hover:bg-primary-orange hover:text-white font-bold transition-all px-3.5 py-2"
+            leftIcon={<Code2 className="w-4 h-4 text-inherit" />}
+          >
+            Story Function & Logic Audit
+            {storyFunctionAnalysis?.total_functions ? (
+              <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                storyFunctionAnalysis.has_issues ? 'bg-amber-500 text-white' : 'bg-green-600 text-white'
+              }`}>
+                {storyFunctionAnalysis.total_functions}
+              </span>
+            ) : null}
+          </Button>
+
           <Button
             variant="default"
             onClick={() => navigate(`/session/${id}/upload`)}
